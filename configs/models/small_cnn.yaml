@@ -1,0 +1,3 @@
+# Conventional conv-pool-FC baseline. Framing only, not a parameter-matched control.
+model:
+  name: small_cnn

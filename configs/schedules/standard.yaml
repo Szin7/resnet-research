@@ -1,0 +1,8 @@
+# Standard schedule -- the default for all reported results.
+# ~1-2 points below the paper's full-length schedule; deviation is documented.
+training:
+  epochs: 80
+  scheduler: step
+  step_milestones: [40, 60]   # 50% / 75% of training, mirroring the paper
+  step_gamma: 0.1
+  amp: true

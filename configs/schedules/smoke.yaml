@@ -1,0 +1,8 @@
+# Smoke schedule -- for wiring / sanity checks, not for results.
+training:
+  epochs: 3
+  scheduler: constant
+  amp: false
+logging:
+  save_best: false
+  save_final: false

@@ -1,0 +1,43 @@
+# Base configuration. Every run starts from this file; model / schedule / experiment
+# fragments are merged on top (left to right), then dotted --set overrides are applied.
+# See docs/project_specification.md sections 5 and 9.
+
+seed: 1
+split_seed: 42          # controls the 45k/5k train/val split only; fixed forever
+
+model:
+  name: resnet          # resnet | plain | small_cnn | small_cnn_deep
+  depth: 56             # requires (depth - 2) % 6 == 0 for resnet / plain
+  shortcut: A           # A (identity, zero-pad) | B (proj at transitions) | C (proj everywhere)
+  use_bn: true
+  zero_init_residual: false
+  num_classes: 10
+
+data:
+  dataset: cifar10
+  root: data
+  val_size: 5000
+  augment: standard     # standard | minimal
+  normalize: per_channel
+
+training:
+  epochs: 80
+  batch_size: 128
+  optimizer: sgd
+  lr: 0.1
+  momentum: 0.9
+  nesterov: false
+  weight_decay: 0.0001
+  scheduler: step       # step | cosine | constant
+  step_milestones: [40, 60]
+  step_gamma: 0.1
+  warmup: none          # none | resnet110
+  amp: true
+
+logging:
+  out_dir: results/runs
+  run_name: null        # auto-generated from model + seed if null
+  save_best: true
+  save_final: true
+  grad_flow: false
+  grad_flow_batches: [0]

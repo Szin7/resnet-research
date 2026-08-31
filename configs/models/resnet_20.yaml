@@ -1,0 +1,4 @@
+model:
+  name: resnet
+  depth: 20
+  shortcut: A

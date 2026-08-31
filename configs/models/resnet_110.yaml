@@ -1,0 +1,7 @@
+# Optional stretch model. Needs LR warm-up to train reliably (paper Section 4.2).
+model:
+  name: resnet
+  depth: 110
+  shortcut: A
+training:
+  warmup: resnet110

@@ -1,0 +1,8 @@
+# Paper-faithful schedule (~64k iterations at batch 128 over the 45k train split).
+# Optional -- for 1-2 headline models only, as a parity check. ~3x the compute of standard.
+training:
+  epochs: 182
+  scheduler: step
+  step_milestones: [91, 137]  # 50% / 75%
+  step_gamma: 0.1
+  amp: true

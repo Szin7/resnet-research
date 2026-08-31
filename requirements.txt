@@ -1,0 +1,17 @@
+# Runtime + dev dependencies.
+#
+# On Google Colab, torch and torchvision are already installed; the bounds below
+# are lower bounds, not pins. The reproducibility source of truth for any given
+# run is results/runs/<run_name>/env.json, which records the exact versions and
+# the GPU the run actually used.
+
+torch>=2.1
+torchvision>=0.16
+numpy>=1.24
+pyyaml>=6.0
+matplotlib>=3.7
+torchinfo>=1.8
+
+# dev
+pytest>=7.4
+ruff>=0.4

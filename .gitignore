@@ -1,0 +1,30 @@
+# datasets (downloaded on demand)
+data/
+
+# model checkpoints -- large, regenerable. metrics.csv / summary.json / env.json
+# under results/runs/ are small and ARE committed.
+*.pt
+*.pth
+*.ckpt
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# notebooks
+.ipynb_checkpoints/
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
