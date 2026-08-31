@@ -6,6 +6,8 @@ synthetic dataset and batch so forward/backward/optimizer wiring can be checked 
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 import torch
 from torch.utils.data import TensorDataset
@@ -39,3 +41,16 @@ def run_dir(tmp_path):
     d = tmp_path / "run"
     d.mkdir()
     return d
+
+
+@pytest.fixture(scope="session")
+def cifar_root() -> str:
+    """Path to a local CIFAR-10 download, or skip the test.
+
+    Tests never download (keeps the suite fast and offline). Run
+    ``python scripts/prepare_data.py`` once to populate ``data/``.
+    """
+    root = Path("data")
+    if not (root / "cifar-10-batches-py").exists():
+        pytest.skip("CIFAR-10 not present; run: python scripts/prepare_data.py")
+    return str(root)

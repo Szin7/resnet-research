@@ -1,5 +1,5 @@
-# datasets (downloaded on demand)
-data/
+# dataset downloads (top-level only -- NOT src/resnet_research/data/)
+/data/
 
 # model checkpoints -- large, regenerable. metrics.csv / summary.json / env.json
 # under results/runs/ are small and ARE committed.
@@ -12,8 +12,8 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .eggs/
-build/
-dist/
+/build/
+/dist/
 .venv/
 venv/
 .pytest_cache/
