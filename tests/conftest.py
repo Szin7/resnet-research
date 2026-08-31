@@ -43,6 +43,28 @@ def run_dir(tmp_path):
     return d
 
 
+@pytest.fixture
+def tiny_train_config():
+    """Factory for a fast, valid config: a depth-8 ResNet, 3 epochs, batch 32, AMP off.
+    Pass ``training`` keys to override, e.g. ``tiny_train_config(epochs=40, lr=0.1)``.
+    """
+    from resnet_research.utils.config import load_config
+
+    repo = Path(__file__).resolve().parents[1]
+
+    def _make(**training):
+        cfg = load_config(
+            [repo / "configs" / "models" / "resnet_20.yaml"],
+            base=repo / "configs" / "default.yaml",
+        )
+        cfg["model"]["depth"] = 8
+        cfg["training"].update({"epochs": 3, "batch_size": 32, "amp": False})
+        cfg["training"].update(training)
+        return cfg
+
+    return _make
+
+
 @pytest.fixture(scope="session")
 def cifar_root() -> str:
     """Path to a local CIFAR-10 download, or skip the test.
