@@ -30,6 +30,11 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+pythonpath = ["."]   # so tests can import the scripts/ entry points
+filterwarnings = [
+    # torchvision's CIFAR loader triggers a numpy 2.4 deprecation; not our code
+    "ignore:dtype\\(\\)",
+]
 
 [tool.ruff]
 line-length = 100
