@@ -153,9 +153,13 @@ reader expects, not as a parameter-matched control.
 Flatten → Linear(128*4*4, 256) → ReLU → Dropout(0.5) → Linear(256, 10)
 ```
 
-`SmallCNN-deep` — same three-block skeleton with 4 conv layers per block (~12 conv layers), same
-head. Deliberately keeps maxpool + FC + dropout (a different design philosophy from ResNet). Exact
-param counts asserted in tests once implemented; both land near ~0.8–1.0M.
+`SmallCNN-deep` — same three-block skeleton with 4 conv layers per block (12 conv layers), same
+head. Deliberately keeps maxpool + FC + dropout (a different design philosophy from ResNet).
+
+Measured parameter counts (asserted in `tests/test_baselines.py`): **SmallCNN 814,570**
+(6 conv layers), **SmallCNN-deep 1,202,538** (12 conv layers). Both use He init via the shared
+`initialize_weights`. These sit in the same order of magnitude as resnet-56 (0.85M) and
+resnet-110 (1.7M), which is enough for the framing role.
 
 ---
 
@@ -399,3 +403,5 @@ session loses nothing; training loop checkpoints every epoch and resumes from `f
 | Date | Change | Reason |
 |------|--------|--------|
 | 2026-08-31 | Initial spec (Phase 2). | — |
+| 2026-08-31 | MAC-counting tool set to `torchinfo` (§6 said "fvcore or ptflops"). | lighter dependency, also gives the layer summary |
+| 2026-08-31 | §4.5 baseline param counts filled from implementation (814,570 / 1,202,538). | Phase 6 built the baselines |
