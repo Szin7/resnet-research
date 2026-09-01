@@ -1,0 +1,12 @@
+# Tiny experiment used only by the test suite (2 runs, 2 epochs, checkpoints on).
+name: mini
+description: pipeline integration test
+schedule: configs/schedules/smoke.yaml
+runs:
+  - config: configs/models/resnet_20.yaml
+    overrides: ["training.epochs=2", "logging.save_final=true", "logging.save_best=true"]
+  - config: configs/models/plain_20.yaml
+    overrides: ["training.epochs=2", "logging.save_final=true", "logging.save_best=true"]
+figures:
+  - depth_vs_val_accuracy
+  - training_loss_curves

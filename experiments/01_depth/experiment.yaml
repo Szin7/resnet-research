@@ -1,0 +1,22 @@
+name: depth
+description: >
+  Does increasing depth always improve optimization and validation performance? Do deeper plain
+  networks show higher training error (an optimization failure, not overfitting)?
+
+schedule: configs/schedules/standard.yaml
+
+runs:
+  - config: configs/models/plain_20.yaml
+  - config: configs/models/plain_32.yaml
+  - config: configs/models/plain_44.yaml
+  - config: configs/models/plain_56.yaml
+  - config: configs/models/resnet_20.yaml
+  - config: configs/models/resnet_32.yaml
+  - config: configs/models/resnet_44.yaml
+  - config: configs/models/resnet_56.yaml
+
+figures:
+  - depth_vs_train_error
+  - depth_vs_val_accuracy
+  - training_loss_curves
+  - val_accuracy_curves

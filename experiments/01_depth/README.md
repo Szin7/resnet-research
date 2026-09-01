@@ -19,6 +19,21 @@ networks show higher *training* error (an optimization failure), as opposed to j
 - Varied: depth, and residual on/off.
 - Metrics: final train / val / test accuracy and loss, training-loss curves, epochs-to-{60,80}% train accuracy, parameter count.
 
+## How to run
+
+```bash
+# ~3 h on a Colab T4; finished runs are skipped so it is safe to re-run after a disconnect
+python scripts/run_experiment.py --experiment experiments/01_depth/experiment.yaml --device cuda
+
+# then evaluate each run on the held-out test set
+for run in results/runs/plain-* results/runs/resnet-*; do
+    python scripts/evaluate.py --run "$run" --device cuda
+done
+```
+
+Or use `notebooks/colab_train.ipynb`. Figures land in `experiments/01_depth/figures/`; the run
+config, environment, and per-epoch metrics for each model land in `results/runs/<name>/`.
+
 ## Results
 _Pending._
 

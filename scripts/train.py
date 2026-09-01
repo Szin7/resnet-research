@@ -16,8 +16,6 @@ import argparse
 import json
 from pathlib import Path
 
-import torch
-
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
@@ -38,46 +36,25 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def _resolve_device(choice: str) -> torch.device:
-    if choice == "auto":
-        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    return torch.device(choice)
-
-
 def main(argv: list[str] | None = None) -> None:
     args = build_parser().parse_args(argv)
 
-    from torch.utils.data import DataLoader, Subset
-
-    from resnet_research.data.dataset import build_dataloaders
-    from resnet_research.models import build_model
-    from resnet_research.training.trainer import Trainer
+    from resnet_research.training.runner import resolve_device, run_training
     from resnet_research.utils.config import load_config, resolve_run_name
-    from resnet_research.utils.seed import set_seed
 
     overrides = list(args.set)
     if args.data_root:
         overrides.append(f"data.root={args.data_root}")
     cfg = load_config([args.config, args.schedule], overrides=overrides)
 
-    set_seed(cfg["seed"])
-    device = _resolve_device(args.device)
     out_dir = Path(cfg["logging"]["out_dir"]) / resolve_run_name(cfg)
-
-    train_loader, val_loader, _ = build_dataloaders(cfg, num_workers=args.num_workers)
-    if args.subset_size:
-        batch_size = cfg["training"]["batch_size"]
-        train_loader = DataLoader(
-            Subset(train_loader.dataset, range(args.subset_size)),
-            batch_size=batch_size, shuffle=True, num_workers=args.num_workers,
-        )
-        val_loader = DataLoader(
-            Subset(val_loader.dataset, range(max(1, args.subset_size // 4))),
-            batch_size=batch_size, num_workers=args.num_workers,
-        )
-    model = build_model(cfg["model"])
-    trainer = Trainer(model, train_loader, val_loader, cfg=cfg, device=device, out_dir=out_dir)
-    summary = trainer.fit()
+    summary = run_training(
+        cfg,
+        device=resolve_device(args.device),
+        out_dir=out_dir,
+        num_workers=args.num_workers,
+        subset_size=args.subset_size,
+    )
 
     print(json.dumps(summary, indent=2))
     print(f"\nrun written to {out_dir}")
