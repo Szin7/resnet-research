@@ -62,6 +62,12 @@ def main(argv: list[str] | None = None) -> None:
     runs_dir = Path(args.runs_dir)
 
     planned = _plan(spec, args.data_root)
+    if args.subset_size is not None:
+        if args.subset_size < 1:
+            raise ValueError("subset-size must be positive")
+        planned = [(f"{name}_subset{args.subset_size}",
+                    {**cfg, "data": {**cfg["data"], "debug_subset_size": args.subset_size}})
+                   for name, cfg in planned]
 
     if args.dry_run:
         for name, cfg in planned:
@@ -74,7 +80,10 @@ def main(argv: list[str] | None = None) -> None:
         for i, (name, cfg) in enumerate(planned, 1):
             out_dir = runs_dir / name
             if (out_dir / "summary.json").exists():
-                logger.info(f"[{i}/{len(planned)}] skip {name} (summary.json exists)")
+                path = out_dir / "config.yaml"
+                if not path.exists() or yaml.safe_load(path.read_text()) != cfg:
+                    raise ValueError(f"Cannot skip {name}: existing run has different settings")
+                logger.info(f"[{i}/{len(planned)}] skip {name} (completed)")
                 continue
             logger.info(f"[{i}/{len(planned)}] training {name}")
             run_training(

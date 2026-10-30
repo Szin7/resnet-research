@@ -16,7 +16,8 @@ def test_plan_resolves_all_eight_runs():
     planned = run_experiment._plan(spec, data_root=None)
     names = {name for name, _ in planned}
     assert len(planned) == 8
-    assert {"plain-20_seed1", "plain-56_seed1", "resnet-20_seed1", "resnet-56_seed1"} <= names
+    assert all(any(n.startswith(prefix + "_") for n in names) for prefix in
+               ("plain-20_seed1", "plain-56_seed1", "resnet-20_seed1", "resnet-56_seed1"))
     for _, cfg in planned:
         assert cfg["training"]["epochs"] == 80  # standard schedule merged in
         assert cfg["training"]["scheduler"] == "step"
@@ -32,5 +33,5 @@ def test_dry_run_prints_every_run(capsys):
     run_experiment.main(["--experiment", str(DEPTH_EXPERIMENT), "--dry-run"])
     out = capsys.readouterr().out
     for depth in (20, 32, 44, 56):
-        assert f"plain-{depth}_seed1" in out
-        assert f"resnet-{depth}_seed1" in out
+        assert f"plain-{depth}_seed1_" in out
+        assert f"resnet-{depth}_seed1_" in out
