@@ -1,0 +1,11 @@
+name: "remove_skip"
+description: "Ablate the additive residual connection at depth 56"
+schedule: "configs/schedules/standard.yaml"
+runs:
+  - config: "configs/models/plain_56.yaml"
+    overrides: []
+  - config: "configs/models/resnet_56.yaml"
+    overrides: []
+figures:
+  - "training_loss_curves"
+  - "val_accuracy_curves"

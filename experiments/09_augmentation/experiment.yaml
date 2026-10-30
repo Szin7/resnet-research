@@ -1,0 +1,11 @@
+name: "augmentation"
+description: "Compare standard crop and flip to no augmentation"
+schedule: "configs/schedules/standard.yaml"
+runs:
+  - config: "configs/models/resnet_20.yaml"
+    overrides: []
+  - config: "configs/models/resnet_20.yaml"
+    overrides: ["data.augment=minimal"]
+figures:
+  - "training_loss_curves"
+  - "val_accuracy_curves"

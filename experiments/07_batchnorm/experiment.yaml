@@ -1,0 +1,15 @@
+name: "batchnorm"
+description: "Batch normalization contribution with a recorded LR adjustment"
+schedule: "configs/schedules/standard.yaml"
+runs:
+  - config: "configs/models/resnet_20.yaml"
+    overrides: []
+  - config: "configs/models/resnet_20.yaml"
+    overrides: ["model.use_bn=false","training.lr=0.01"]
+  - config: "configs/models/plain_20.yaml"
+    overrides: []
+  - config: "configs/models/plain_20.yaml"
+    overrides: ["model.use_bn=false","training.lr=0.01"]
+figures:
+  - "training_loss_curves"
+  - "val_accuracy_curves"
