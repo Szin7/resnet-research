@@ -1,19 +1,26 @@
-"""Gradient-flow recorder (Phase 14)."""
-
-from __future__ import annotations
-
-import pytest
-
-pytestmark = pytest.mark.skip(reason="gradient-flow tools implemented in Phase 14")
-
-
-def test_probe_returns_norm_per_conv_layer(tiny_batch):
-    """probe_gradient_flow(cifar_resnet(20), batch) returns one finite norm per conv/linear weight."""
+"""Check gradient instrumentation on a small synthetic batch."""
+import json
+import numpy as np
+import torch
+from resnet_research.analysis.gradient_flow import GradientFlowRecorder, probe_gradient_flow
+from resnet_research.models.resnet import cifar_resnet
 
 
-def test_recorder_snapshots_accumulate():
-    """GradientFlowRecorder.snapshot called at 3 steps -> records() has 3 entries."""
+def test_probe_returns_norm_per_weighted_layer(tiny_batch):
+    model = cifar_resnet(8)
+    values = probe_gradient_flow(model, tiny_batch, device=torch.device("cpu"))
+    expected = sum(isinstance(m, (torch.nn.Conv2d, torch.nn.Linear)) for m in model.modules())
+    assert len(values) == expected
+    assert all(np.isfinite(value) for value in values.values())
 
 
-def test_norms_are_positive_and_finite(tiny_batch):
-    """All recorded gradient norms are > 0 and not NaN/inf at initialization."""
+def test_recorder_snapshots_accumulate(tmp_path):
+    model = cifar_resnet(8)
+    model(torch.randn(8, 3, 32, 32)).sum().backward()
+    recorder = GradientFlowRecorder(model)
+    for step in range(3):
+        recorder.snapshot(step)
+    assert len(recorder.records()) == 3
+    path = tmp_path / "norms.json"
+    recorder.save(path)
+    assert len(json.loads(path.read_text())) == 3
