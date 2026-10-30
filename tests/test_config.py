@@ -87,7 +87,7 @@ def test_amp_disabled_with_grad_flow():
 )
 def test_resolve_run_name_default(fragment, expected):
     cfg = load_config([MODELS / fragment], base=DEFAULT)
-    assert resolve_run_name(cfg) == expected
+    assert resolve_run_name(cfg).startswith(expected + "_")
 
 
 def test_dump_config_roundtrip(tmp_path):

@@ -1,65 +1,35 @@
-# Research Report
+# Research report
 
-_Status: skeleton. Written in Phases 19–20 from measured results. Concise undergraduate-report
-style. No numbers until they are measured._
-
-## Abstract
-_Pending._
-
-## Introduction
-_Pending._ Context: the degradation problem and the residual proposal.
+**Status: implementation and experimental protocols prepared; findings pending training.**
 
 ## Research question
-How do residual connections affect the optimization and generalization of deep CNNs on CIFAR-10,
-and does the benefit grow with depth? (Sub-questions: `docs/project_specification.md` §2.)
 
-## Background
-_Pending._ Summary of [paper_notes.md](paper_notes.md).
+How does the addition of residual connections affect optimization and generalization in CIFAR-sized convolutional networks as depth increases?
 
-## Residual learning
-_Pending._ Summary of [mathematics.md](mathematics.md) §4–5.
+## Motivation
 
-## Mathematical foundation
-_Pending._ Pointer to [mathematics.md](mathematics.md).
+The original ResNet study showed that simply making a plain network deeper did not reliably improve training. Residual shortcuts were proposed to ease optimization. This project tests that comparison on CIFAR-10 with a smaller and explicitly documented compute budget.
 
-## Architecture
-_Pending._ Pointer to `architecture.md`.
+## Methods
 
-## Implementation
-_Pending._ From-scratch model, training pipeline, gradient-flow instrumentation.
+Custom PyTorch implementations cover plain and residual CIFAR networks with the same weighted layers. For the central comparison, parameter-free shortcut option A keeps the total number of learnable parameters equal across corresponding models. The fixed data split uses 45,000 training images and 5,000 validation images; the official test set is reserved for the final assessment.
 
-## Dataset
-_Pending._ CIFAR-10, splits, augmentation.
+The standard schedule has 80 epochs with SGD, momentum and two learning-rate drops. This differs from the longer schedule used in the paper. Controlled experiment matrices additionally vary shortcuts, BatchNorm, optimization and image augmentation.
 
-## Experimental methodology
-_Pending._ The frozen spec; the Q→hypothesis→setup→results→interpretation→limitations template.
+## Measurements
 
-## Baselines
-_Pending._
+Training error and loss are the main evidence for the depth-degradation question. Validation accuracy provides a separate measure of generalization. Final test evaluation, confusion matrices, seed variation, gradient-norm profiles and inference benchmarks provide additional evidence.
 
 ## Results
-_Pending._ Depth, plain vs residual, per the experiment folders.
 
-## Ablation studies
-_Pending._ Shortcut removal; identity vs projection; BatchNorm; the ablation grid.
+Pending measured experimental runs. No numerical claims have been inserted.
 
-## Gradient-flow analysis
-_Pending._ Pointer to `gradient_analysis.md`.
+## Discussion and limitations
 
-## Error analysis
-_Pending._ Pointer to `error_analysis.md`.
+Interpretation must distinguish optimization difficulty from overfitting, and avoid treating gradient magnitude alone as a complete explanation. Experiments with changes to both BatchNorm and learning rate cannot isolate BatchNorm's independent effect.
 
-## Computational analysis
-_Pending._ Parameters, MACs, training time, inference latency, memory.
-
-## Discussion
-_Pending._
-
-## Limitations
-_Pending._ Pointer to [limitations.md](limitations.md).
+The study uses CIFAR-10 and a shorter schedule rather than a complete ImageNet or paper-faithful reproduction. Model outputs and figures will be referenced here after the experiments have run.
 
 ## Conclusion
-_Pending._
 
-## References
-_Pending._ See [mathematics.md](mathematics.md).
+Pending the results. The code establishes an experimental framework, not yet an empirical conclusion.

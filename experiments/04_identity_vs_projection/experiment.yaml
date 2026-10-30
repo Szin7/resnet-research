@@ -1,0 +1,13 @@
+name: "shortcut_options"
+description: "Compare options A, B and C at fixed network depth"
+schedule: "configs/schedules/standard.yaml"
+runs:
+  - config: "configs/models/resnet_56.yaml"
+    overrides: ["model.shortcut=A"]
+  - config: "configs/models/resnet_56.yaml"
+    overrides: ["model.shortcut=B"]
+  - config: "configs/models/resnet_56.yaml"
+    overrides: ["model.shortcut=C"]
+figures:
+  - "training_loss_curves"
+  - "val_accuracy_curves"

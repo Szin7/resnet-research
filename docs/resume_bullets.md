@@ -1,10 +1,9 @@
-# Resume bullets
+# Describing this project
 
-_Status: placeholder. Written in Phase 22, after results exist. No numeric claims until measured._
+The repository currently supports a from-scratch CIFAR ResNet implementation, parameter-matched plain-network comparisons, experiment configuration, checkpointed training and model-evaluation tools.
 
-Three variants planned (master plan §40): AI/ML Engineer, Deep Learning / Research, General ML
-Engineer. Each will describe specific technical work (from-scratch implementation, controlled
-experiments, gradient-flow analysis, ablations, benchmarking, reproducibility) and cite only
-measured outcomes.
+Until the full experimental runs are published, an accurate resume description is:
 
-Do not use this file until the final analysis phase.
+> Implemented CIFAR-sized residual and plain convolutional networks in PyTorch and developed a reproducible experimental workflow to study optimization across network depth, shortcut choices and training settings.
+
+After the research runs are complete, add measured findings, including the training protocol and uncertainty across seeds. Do not describe pending gradient studies or hypothetical accuracy improvements as completed results.

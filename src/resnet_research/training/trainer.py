@@ -70,7 +70,31 @@ class Trainer:
         self.best_val_acc = -1.0
         self.start_epoch = 1
 
+        self._validate_existing_config()
         write_run_metadata(self.out_dir, self.cfg)
+
+    def _validate_existing_config(self) -> None:
+        """Fail if a results directory belongs to another training setup."""
+        import yaml
+        path = self.out_dir / "config.yaml"
+        if not path.exists():
+            return
+        previous = yaml.safe_load(path.read_text())
+        if previous == self.cfg:
+            return
+        # A longer training run may continue when the original schedule is unchanged.
+        # Cosine schedules depend on the planned total epochs, so exclude them.
+        old_train = dict(previous.get("training", {}))
+        new_train = dict(self.cfg.get("training", {}))
+        old_epochs = old_train.pop("epochs", None)
+        new_epochs = new_train.pop("epochs", None)
+        previous["training"] = old_train
+        current = dict(self.cfg)
+        current["training"] = new_train
+        if (previous == current and old_epochs is not None and new_epochs is not None
+                and new_epochs >= old_epochs and new_train.get("scheduler") in ("step", "constant")):
+            return
+        raise ValueError(f"{self.out_dir} has a different configuration; choose another run name.")
 
     # -- public ---------------------------------------------------------------
 
@@ -163,6 +187,9 @@ class Trainer:
             epoch=epoch,
             metrics={"val_acc": val_acc},
             config=self.cfg if name == "final.pt" else None,
+            scaler=self.scaler if with_optimizer else None,
+            save_rng_state=with_optimizer,
+            data_generator=self.train_loader.generator if with_optimizer else None,
         )
 
     def _maybe_resume(self) -> int:
@@ -175,6 +202,9 @@ class Trainer:
             optimizer=self.optimizer,
             scheduler=self.scheduler,
             map_location=self.device,
+            scaler=self.scaler,
+            restore_rng=True,
+            data_generator=self.train_loader.generator,
         )
         done_epoch = int(payload["epoch"])
         self.metrics.truncate_after(done_epoch)

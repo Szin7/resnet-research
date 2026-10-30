@@ -8,6 +8,7 @@ the AMP interlocks and ``validate_config`` enforces the spec's constraints.
 from __future__ import annotations
 
 import copy
+import hashlib
 import warnings
 from collections.abc import Iterable, Mapping
 from pathlib import Path
@@ -138,6 +139,15 @@ def load_config(
     return cfg
 
 
+def research_signature(cfg: Mapping[str, Any]) -> str:
+    """Identify a run by its scientific settings, rather than only its model."""
+    data = {key: value for key, value in cfg["data"].items() if key != "root"}
+    fields = {"model": cfg["model"], "data": data, "training": cfg["training"],
+              "seed": cfg["seed"], "split_seed": cfg["split_seed"]}
+    payload = yaml.safe_dump(fields, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()[:10]
+
+
 def resolve_run_name(cfg: Mapping[str, Any]) -> str:
     """Default run directory name, e.g. ``resnet-56_seed1`` or ``small_cnn_seed1``."""
     if cfg["logging"].get("run_name"):
@@ -147,7 +157,7 @@ def resolve_run_name(cfg: Mapping[str, Any]) -> str:
         stem = f"{model['name']}-{model['depth']}"
     else:
         stem = model["name"]
-    return f"{stem}_seed{cfg['seed']}"
+    return f"{stem}_seed{cfg['seed']}_{research_signature(cfg)}"
 
 
 def dump_config(cfg: Mapping[str, Any], path: str | Path) -> None:

@@ -1,0 +1,23 @@
+name: "ablation_grid"
+description: "Residual connections, depth and BatchNorm combinations"
+schedule: "configs/schedules/standard.yaml"
+runs:
+  - config: "configs/models/plain_20.yaml"
+    overrides: ["model.use_bn=true"]
+  - config: "configs/models/plain_20.yaml"
+    overrides: ["model.use_bn=false","training.lr=0.01"]
+  - config: "configs/models/resnet_20.yaml"
+    overrides: ["model.use_bn=true"]
+  - config: "configs/models/resnet_20.yaml"
+    overrides: ["model.use_bn=false","training.lr=0.01"]
+  - config: "configs/models/plain_56.yaml"
+    overrides: ["model.use_bn=true"]
+  - config: "configs/models/plain_56.yaml"
+    overrides: ["model.use_bn=false","training.lr=0.01"]
+  - config: "configs/models/resnet_56.yaml"
+    overrides: ["model.use_bn=true"]
+  - config: "configs/models/resnet_56.yaml"
+    overrides: ["model.use_bn=false","training.lr=0.01"]
+figures:
+  - "training_loss_curves"
+  - "val_accuracy_curves"

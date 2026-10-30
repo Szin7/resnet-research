@@ -9,7 +9,7 @@ description = "From-scratch reproduction and experimental study of Deep Residual
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-authors = [{ name = "<your name>" }]
+authors = [{ name = "Sujin Prajapati" }]
 keywords = ["resnet", "residual-learning", "cifar10", "pytorch", "reproduction"]
 
 dependencies = [

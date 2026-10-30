@@ -1,0 +1,15 @@
+name: "optimization"
+description: "Learning rate schedule and momentum comparisons"
+schedule: "configs/schedules/standard.yaml"
+runs:
+  - config: "configs/models/resnet_20.yaml"
+    overrides: []
+  - config: "configs/models/resnet_20.yaml"
+    overrides: ["training.scheduler=cosine"]
+  - config: "configs/models/resnet_20.yaml"
+    overrides: ["training.scheduler=constant"]
+  - config: "configs/models/resnet_20.yaml"
+    overrides: ["training.momentum=0.0"]
+figures:
+  - "training_loss_curves"
+  - "val_accuracy_curves"

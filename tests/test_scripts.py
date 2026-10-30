@@ -22,7 +22,7 @@ def test_train_script_runs_end_to_end(cifar_root, tmp_path):
             "data.root=" + cifar_root,
         ]
     )
-    run_dir = tmp_path / "resnet-20_seed1"
+    run_dir = next(tmp_path.glob("resnet-20_seed1_*"))
     summary = json.loads((run_dir / "summary.json").read_text())
     assert summary["final_epoch"] == 2
     assert summary["parameters"] == 269_722
@@ -41,18 +41,18 @@ def test_experiment_then_evaluate_end_to_end(cifar_root, tmp_path):
     ]
     run_experiment.main([*common, "--subset-size", "120", "--data-root", cifar_root])
 
-    assert (runs_dir / "resnet-20_seed1" / "summary.json").exists()
-    assert (runs_dir / "plain-20_seed1" / "summary.json").exists()
+    assert list(runs_dir.glob("resnet-20_seed1_*/summary.json"))
+    assert list(runs_dir.glob("plain-20_seed1_*/summary.json"))
     assert (figures_dir / "training_loss_curves.png").exists()
 
     # second call skips finished runs and just rebuilds figures
     run_experiment.main([*common, "--figures-only"])
 
     evaluate.main(
-        ["--run", str(runs_dir / "resnet-20_seed1"), "--device", "cpu",
+        ["--run", str(next(runs_dir.glob("resnet-20_seed1_*"))), "--device", "cpu",
          "--num-workers", "0", "--data-root", cifar_root, "--subset-size", "120"]
     )
-    test_metrics = json.loads((runs_dir / "resnet-20_seed1" / "test_metrics.json").read_text())
+    test_metrics = json.loads((next(runs_dir.glob("resnet-20_seed1_*")) / "test_metrics.json").read_text())
     assert "final.pt" in test_metrics["test_accuracy"]
     assert len(test_metrics["confusion_matrix"]) == 10
-    assert (runs_dir / "resnet-20_seed1" / "confusion_matrix.png").exists()
+    assert (next(runs_dir.glob("resnet-20_seed1_*")) / "confusion_matrix.png").exists()

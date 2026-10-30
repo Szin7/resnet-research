@@ -47,6 +47,8 @@ def main(argv: list[str] | None = None) -> None:
         overrides.append(f"data.root={args.data_root}")
     cfg = load_config([args.config, args.schedule], overrides=overrides)
 
+    if args.subset_size is not None:
+        cfg["data"]["debug_subset_size"] = args.subset_size
     out_dir = Path(cfg["logging"]["out_dir"]) / resolve_run_name(cfg)
     summary = run_training(
         cfg,
