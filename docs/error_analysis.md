@@ -1,14 +1,20 @@
-# Error analysis
+# Classification error analysis
 
-_Status: outline. Filled in Phase 17 from Experiment 10, using the best model's test predictions._
+The evaluation script computes a confusion matrix, per-class precision, recall and F1, and a ranked list of confused class pairs.
 
-Planned contents:
+Run it after completing and validating a model:
 
-- Confusion matrix (raw counts + row-normalized figure).
-- Per-class precision / recall / F1 / support table.
-- The most-confused class pairs, ranked from the confusion matrix (not assumed in advance).
-- Gallery of ≥ 24 misclassified images labelled `true → predicted (confidence)`.
-- Discussion of plausible reasons, grounded in the examples — e.g. only claim "cat/dog is the
-  hardest pair" if the numbers show it.
-- Whether errors are high-confidence (a calibration concern) or low-confidence (genuine ambiguity).
-- Limitations: single model, single seed, CIFAR-10's 32×32 resolution limits what is separable.
+```bash
+python scripts/evaluate.py --run results/runs/<run-directory> --device cuda --gallery 24
+```
+
+The optional gallery displays examples that the model classified incorrectly, with the predicted label and confidence. Images are visualized for diagnostic inspection only and are not used to adjust the model after test evaluation.
+
+Questions for the written discussion:
+
+- Which classes have the lowest recall?
+- Are most errors concentrated in a few class pairs?
+- Does the confusion pattern change between plain and residual networks?
+- Do improvements in aggregate accuracy hide worse outcomes for particular classes?
+
+**Status: no measured error analysis is available yet.**
