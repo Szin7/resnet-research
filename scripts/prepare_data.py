@@ -28,7 +28,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     print(f"CIFAR-10 ready in {args.root!r}")
     print(f"  train {len(train_ds)}  val {len(val_ds)}  test {len(test_ds)}")
-    print(f"  normalization stats cached to {args.root}/cifar10_stats_split{args.split_seed}.json")
+    print(f"  normalization stats cached to {args.root}/cifar10_stats_split{args.split_seed}_train{len(train_ds)}.json")
 
 
 if __name__ == "__main__":

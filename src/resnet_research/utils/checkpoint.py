@@ -7,9 +7,11 @@ resume), ``epoch``, ``metrics``, and the resolved ``config``. ``best.pt`` stores
 
 from __future__ import annotations
 
+import random
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 from torch import nn
 from torch.optim import Optimizer
@@ -25,6 +27,9 @@ def save_checkpoint(
     epoch: int = 0,
     metrics: dict[str, Any] | None = None,
     config: dict[str, Any] | None = None,
+    scaler: Any | None = None,
+    save_rng_state: bool = False,
+    data_generator: torch.Generator | None = None,
 ) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -37,7 +42,19 @@ def save_checkpoint(
         payload["metrics"] = metrics
     if config is not None:
         payload["config"] = config
-    torch.save(payload, path)
+    if scaler is not None:
+        payload["scaler"] = scaler.state_dict()
+    if save_rng_state:
+        payload["rng_state"] = {
+            "python": random.getstate(),
+            "numpy": np.random.get_state(),
+            "torch": torch.random.get_rng_state(),
+            "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
+            "data_generator": data_generator.get_state() if data_generator is not None else None,
+        }
+    temporary = path.with_name(path.name + ".tmp")
+    torch.save(payload, temporary)
+    temporary.replace(path)
 
 
 def load_checkpoint(
@@ -47,6 +64,9 @@ def load_checkpoint(
     optimizer: Optimizer | None = None,
     scheduler: LRScheduler | None = None,
     map_location: str | torch.device = "cpu",
+    scaler: Any | None = None,
+    restore_rng: bool = False,
+    data_generator: torch.Generator | None = None,
 ) -> dict[str, Any]:
     """Load a checkpoint, restoring state into any objects passed. Returns the raw dict.
 
@@ -60,4 +80,15 @@ def load_checkpoint(
         optimizer.load_state_dict(payload["optimizer"])
     if scheduler is not None and "scheduler" in payload:
         scheduler.load_state_dict(payload["scheduler"])
+    if scaler is not None and "scaler" in payload:
+        scaler.load_state_dict(payload["scaler"])
+    if restore_rng and "rng_state" in payload:
+        state = payload["rng_state"]
+        random.setstate(state["python"])
+        np.random.set_state(state["numpy"])
+        torch.random.set_rng_state(state["torch"].cpu())
+        if state.get("cuda") is not None and torch.cuda.is_available():
+            torch.cuda.set_rng_state_all(state["cuda"])
+        if data_generator is not None and state.get("data_generator") is not None:
+            data_generator.set_state(state["data_generator"].cpu())
     return payload

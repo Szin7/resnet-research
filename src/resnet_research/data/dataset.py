@@ -64,7 +64,7 @@ def _resolve_stats(
     if normalize != "per_channel":
         raise ValueError(f"unknown normalize {normalize!r}")
 
-    cache_path = Path(root) / f"cifar10_stats_split{split_seed}.json"
+    cache_path = Path(root) / f"cifar10_stats_split{split_seed}_train{len(train_subset)}.json"
     if cache_path.exists():
         cached = json.loads(cache_path.read_text())
         return tuple(cached["mean"]), tuple(cached["std"])
@@ -72,7 +72,7 @@ def _resolve_stats(
     mean, std = channel_statistics(train_subset)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(
-        json.dumps({"mean": mean, "std": std, "split_seed": split_seed}, indent=2)
+        json.dumps({"mean": mean, "std": std, "split_seed": split_seed, "train_size": len(train_subset)}, indent=2)
     )
     return tuple(mean), tuple(std)
 

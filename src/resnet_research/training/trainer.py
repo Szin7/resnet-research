@@ -70,7 +70,15 @@ class Trainer:
         self.best_val_acc = -1.0
         self.start_epoch = 1
 
+        self._validate_existing_config()
         write_run_metadata(self.out_dir, self.cfg)
+
+    def _validate_existing_config(self) -> None:
+        """Fail if a results directory belongs to another training setup."""
+        import yaml
+        path = self.out_dir / "config.yaml"
+        if path.exists() and yaml.safe_load(path.read_text()) != self.cfg:
+            raise ValueError(f"{self.out_dir} has a different configuration; choose another run name.")
 
     # -- public ---------------------------------------------------------------
 
@@ -163,6 +171,9 @@ class Trainer:
             epoch=epoch,
             metrics={"val_acc": val_acc},
             config=self.cfg if name == "final.pt" else None,
+            scaler=self.scaler if with_optimizer else None,
+            save_rng_state=with_optimizer,
+            data_generator=self.train_loader.generator if with_optimizer else None,
         )
 
     def _maybe_resume(self) -> int:
@@ -175,6 +186,9 @@ class Trainer:
             optimizer=self.optimizer,
             scheduler=self.scheduler,
             map_location=self.device,
+            scaler=self.scaler,
+            restore_rng=True,
+            data_generator=self.train_loader.generator,
         )
         done_epoch = int(payload["epoch"])
         self.metrics.truncate_after(done_epoch)
