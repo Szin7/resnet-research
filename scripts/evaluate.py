@@ -24,6 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--data-root", default=None, help="override data.root")
     p.add_argument("--num-workers", type=int, default=2)
     p.add_argument("--subset-size", type=int, default=None, help="limit the test set (smoke test)")
+    p.add_argument("--gallery", type=int, default=0, help="number of misclassified images to visualize")
     return p
 
 
@@ -77,6 +78,16 @@ def main(argv: list[str] | None = None) -> None:
     results["confusion_matrix"] = cm.tolist()
     results["per_class"] = per_class_metrics(cm, CIFAR10_CLASSES)
     results["most_confused_pairs"] = most_confused_pairs(cm, CIFAR10_CLASSES, top=5)
+    if args.gallery > 0:
+        from resnet_research.evaluation.error_analysis import (
+            collect_misclassified, plot_misclassification_gallery,
+        )
+        mistakes = collect_misclassified(best_model, test_loader, device, limit=args.gallery)
+        plot_misclassification_gallery(
+            mistakes, CIFAR10_CLASSES, n=args.gallery,
+            path=run_dir / "misclassified_gallery.png",
+        )
+        results["gallery_count"] = len(mistakes)
 
     (run_dir / "test_metrics.json").write_text(json.dumps(results, indent=2))
     plot_confusion_matrix(
