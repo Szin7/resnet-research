@@ -77,8 +77,24 @@ class Trainer:
         """Fail if a results directory belongs to another training setup."""
         import yaml
         path = self.out_dir / "config.yaml"
-        if path.exists() and yaml.safe_load(path.read_text()) != self.cfg:
-            raise ValueError(f"{self.out_dir} has a different configuration; choose another run name.")
+        if not path.exists():
+            return
+        previous = yaml.safe_load(path.read_text())
+        if previous == self.cfg:
+            return
+        # A longer training run may continue when the original schedule is unchanged.
+        # Cosine schedules depend on the planned total epochs, so exclude them.
+        old_train = dict(previous.get("training", {}))
+        new_train = dict(self.cfg.get("training", {}))
+        old_epochs = old_train.pop("epochs", None)
+        new_epochs = new_train.pop("epochs", None)
+        previous["training"] = old_train
+        current = dict(self.cfg)
+        current["training"] = new_train
+        if (previous == current and old_epochs is not None and new_epochs is not None
+                and new_epochs >= old_epochs and new_train.get("scheduler") in ("step", "constant")):
+            return
+        raise ValueError(f"{self.out_dir} has a different configuration; choose another run name.")
 
     # -- public ---------------------------------------------------------------
 
