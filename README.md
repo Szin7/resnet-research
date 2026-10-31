@@ -1,34 +1,38 @@
-# ResNet from Scratch — CIFAR-10 Research Study
+# ResNet depth study on CIFAR-10
 
-This project examines a question raised by the original ResNet paper: why can adding layers to a plain convolutional network make it harder to optimize, and what changes when those layers have identity shortcuts?
+This repository investigates a result from He et al.'s ResNet paper: a deeper plain convolutional network can be *harder to train* than a shallower one. I used the same CIFAR-style architecture at four depths, with and without residual shortcuts, to compare training behavior under one consistent setup.
 
-The study implements CIFAR-sized residual networks directly in PyTorch. A plain-network switch removes the shortcut while preserving the weighted layers, making the two families comparable at the same depth. The main experiments use CIFAR-10, a fixed training/validation split, and controlled optimizer settings.
+The primary experiment is finished: eight networks, each trained for 80 epochs on CIFAR-10. The matched plain and ResNet models have the same learnable parameter counts. Source code, model configurations, evaluation scripts, and results are included here.
 
-**Current state:** the primary eight-model CIFAR-10 depth sweep (plain and residual networks, depths 20/32/44/56) has finished 80 epochs per model and been evaluated on the held-out test set. Measured results are in [docs/results.md](docs/results.md) and [the summary CSV](results/tables/depth_experiment_summary.csv). Additional-seed replication and further ablations remain pending. At depth 56 the plain network had 19.518% final training error versus 1.036% for its parameter-matched residual counterpart; held-out test accuracy was 79.43% versus 91.68%. These are single-seed findings, not confidence intervals.
+## What the runs showed
 
-## Research question
+| Depth | Plain train error | ResNet train error | Plain test accuracy | ResNet test accuracy |
+|---:|---:|---:|---:|---:|
+| 20 | 4.187% | 2.740% | 89.41% | 91.04% |
+| 32 | 5.380% | 1.556% | 88.77% | 91.73% |
+| 44 | 7.836% | 1.264% | 87.07% | 91.26% |
+| 56 | 19.518% | 1.036% | 79.43% | 91.68% |
 
-How do residual shortcuts affect training behavior and generalization as convolutional networks become deeper?
+For the plain networks, training error increased with depth. The residual networks showed the opposite pattern. Plain-56 and ResNet-56 each have **853,018 parameters**, but their final training errors differ by **18.482 percentage points**.
 
-The first comparison uses plain and residual networks with 20, 32, 44, and 56 weighted layers. Further experiments test shortcut variants, BatchNorm, optimization settings, and augmentation. The experiment descriptions document the hypotheses and limitations before results are collected.
+These results come from one training seed. They show the degradation pattern in this setup, not an uncertainty estimate across repeated experiments.
 
-## Architecture
+See the [full results](docs/results.md), [research report](docs/research_report.md), and [raw summary table](results/tables/depth_experiment_summary.csv).
 
-The CIFAR ResNet follows the 6n + 2 arrangement described by He et al. Three stages use 16, 32, and 64 channels, with spatial resolutions 32x32, 16x16, and 8x8. Each basic block contains two 3x3 convolutions. The main comparison uses parameter-free option-A shortcuts, keeping plain and residual parameter counts equal.
+## Implementation
 
-Implementation: [models](src/resnet_research/models/) · [architecture notes](docs/architecture.md)
+- CIFAR ResNet with 20, 32, 44, or 56 weighted layers (the `6n + 2` layout).
+- Three stages with 16, 32, and 64 channels.
+- Plain and residual variants use the same convolutional layers. Residual option A adds parameter-free shortcuts.
+- CIFAR-10 split: 45,000 training images, 5,000 validation images, and the untouched 10,000-image test set.
+- SGD with momentum, batch size 128, 80 epochs, and learning-rate drops at epochs 40 and 60.
+- Checkpoints, per-epoch CSV logs, and run configuration files saved for each model.
 
-## Data and training
+The [architecture notes](docs/architecture.md) describe the blocks and shortcuts in more detail. The 80-epoch schedule and some preprocessing choices differ from the original paper; this is a controlled comparison rather than an exact reproduction of its reported numbers.
 
-- CIFAR-10: 45,000 training images, 5,000 validation images, and the original 10,000 test images.
-- The validation split is fixed using seed 42. Normalization statistics use the training split only.
-- Standard augmentation uses random crop and horizontal flip. Training uses SGD with momentum and a documented learning-rate schedule.
-- Every completed run records its resolved configuration, environment, per-epoch metrics, and checkpoints. Its directory identity includes a hash of its research settings so different ablations do not overwrite each other.
-- Model selection uses validation accuracy; test evaluation is a separate step.
+## Running the project
 
-## Setup
-
-Python 3.10+ is required. A CUDA GPU is recommended for the full comparison.
+Requires Python 3.10+ and PyTorch. A CUDA GPU is useful for the full experiment.
 
 ```bash
 python -m venv .venv
@@ -38,69 +42,49 @@ python -m pytest -q
 python scripts/prepare_data.py --root data
 ```
 
-## Run the first study
-
-Start by reviewing the eight configurations without training:
+Check the eight planned runs first:
 
 ```bash
 python scripts/run_experiment.py --experiment experiments/01_depth/experiment.yaml --dry-run
 ```
 
-Run the full comparison on a CUDA-capable machine:
+Train the experiment:
 
 ```bash
 python scripts/run_experiment.py --experiment experiments/01_depth/experiment.yaml --device cuda
 ```
 
-The generated run folders appear under `results/runs/`. Evaluate each completed run with:
+The runner skips runs with matching completed summaries and resumes an incomplete run from `checkpoints/final.pt`. Outputs go to `results/runs/` unless a different `--runs-dir` is supplied. In Colab, use [the notebook](notebooks/colab_train.ipynb), which writes checkpoints to Google Drive.
+
+To evaluate a run:
 
 ```bash
 python scripts/evaluate.py --run results/runs/<run-directory> --device cuda
 ```
 
-The experiment runner skips finished runs and resumes unfinished runs when a compatible checkpoint is available. For a quick wiring check, pass `--subset-size 120` and use the smoke schedule. Subset results are not research evidence.
+## Other analysis
 
-## Experiments
+The repository also has scripts to compare layerwise gradient norms, benchmark model computation and latency, and examine class-level errors. The gradient experiment uses separately initialized models trained for five epochs; it is not a gradient trace from the completed 80-epoch checkpoints.
 
-| Study | Configuration | What it examines |
-|---|---|---|
-| Depth sweep | `experiments/01_depth/` | Training error as depth increases |
-| Plain vs residual | `experiments/02_plain_vs_residual/` | Effect of additive shortcuts |
-| Shortcut removal | `experiments/03_residual_ablation/` | Controlled removal of a skip connection |
-| Shortcut choice | `experiments/04_identity_vs_projection/` | Identity, projection at transitions, projection everywhere |
-| Gradient flow | `experiments/05_gradient_flow/` | Weight-gradient norms on a fixed probe batch |
-| Ablation grid | `experiments/06_ablation_grid/` | Residual connections, depth, BatchNorm |
-| BatchNorm | `experiments/07_batchnorm/` | Normalization and learning-rate adjustment |
-| Optimization | `experiments/08_optimization/` | Schedule and momentum |
-| Augmentation | `experiments/09_augmentation/` | Standard augmentation versus none |
+Experiment configurations for shortcut types, BatchNorm, optimizer settings and augmentation are available under [`experiments/`](experiments/), but those additional full-length comparisons have not been reported as completed. See the [experiment guide](docs/experiments.md) and [limitations](docs/limitations.md).
 
-Each experiment YAML can be reviewed using `scripts/run_experiment.py --experiment <path> --dry-run`. Gradient measurements use `scripts/analyze_gradients.py`; computational measurements use `scripts/benchmark.py`.
-
-## Understanding the outputs
-
-The central plots compare training error and validation accuracy across depth, alongside epoch-by-epoch training curves. The project also supports confusion matrices, per-class statistics, misclassified-image samples, gradient profiles, and model-compute benchmarks.
-
-See [results](docs/results.md), [experiment protocols](docs/experiments.md), [research report](docs/research_report.md), and [known limitations](docs/limitations.md).
-
-**Research integrity:** The aim is not to obtain a particular accuracy value. An experiment that contradicts its original hypothesis still belongs in the report. Differences from the original paper's training recipe are documented and any reported measurements must come from actual runs.
-
-## Repository structure
+## Project layout
 
 ```text
-configs/       Model and training configurations
-src/           Models, data, training, evaluation, diagnostics
-scripts/       Training and analysis entry points
-experiments/   Research protocols and experiment matrices
-notebooks/     Colab runner
-tests/         Unit and integration checks
-docs/          Paper notes, architecture, methodology, reporting
-results/       Metrics and figures produced by completed experiments
+configs/        Model and training settings
+src/            Architecture, data, training and analysis code
+scripts/        Commands for training, evaluation and diagnostics
+experiments/    Experiment definitions
+notebooks/      Colab runner
+tests/          Automated checks
+docs/           Design notes and research write-up
+results/        Published result tables
 ```
 
 ## References
 
-- K. He, X. Zhang, S. Ren, J. Sun. *Deep Residual Learning for Image Recognition.* CVPR 2016.
-- K. He, X. Zhang, S. Ren, J. Sun. *Identity Mappings in Deep Residual Networks.* ECCV 2016.
-- S. Ioffe, C. Szegedy. *Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift.* ICML 2015.
+- He, Zhang, Ren and Sun, *Deep Residual Learning for Image Recognition*, CVPR 2016.
+- He, Zhang, Ren and Sun, *Identity Mappings in Deep Residual Networks*, ECCV 2016.
+- Ioffe and Szegedy, *Batch Normalization*, ICML 2015.
 
-Released under the MIT License.
+MIT License.
