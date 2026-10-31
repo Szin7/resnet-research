@@ -1,32 +1,13 @@
 # Limitations
 
-_Status: living document. Constraints known from the design are listed now; experiment-specific
-limitations are added as each experiment is run._
+This document distinguishes what was measured from what is planned.
 
-## By design (compute budget)
-
-- **CIFAR-10, not ImageNet.** The paper's headline experiments are on ImageNet; we reproduce only
-  the CIFAR-10 study (paper §4.2). Conclusions are about small 32×32 images and small models.
-- **Depth ≤ 56 primary** (110 optional). We do not test the 1202-layer regime.
-- **80-epoch schedule**, not the paper's ~182. Expect ~1–2 points below the paper's accuracy; the
-  gap is reported, not hidden.
-- **Single GPU (Colab T4)**, mixed precision for most runs.
-- **Minor recipe deviations**: per-channel standardization vs per-pixel mean subtraction; reflect
-  vs zero crop padding. Tabulated in [project_specification.md](project_specification.md) §11.
-
-## Methodological
-
-- Most experiments use **one seed** for the main comparison; run-to-run variation is quantified
-  separately with seed replicates for resnet-20 and resnet-56. Gaps smaller than ~2× the measured
-  std are reported as "within noise".
-- The plain-vs-residual comparison is parameter-matched (option A) but **not** matched on everything
-  one could imagine (e.g. effective learning dynamics differ because the shortcut changes the loss
-  surface — that is the point).
-- Removing BatchNorm forces a learning-rate change, so that ablation varies two things at once.
-- Grad-CAM / feature-map visualizations (if included) show where activations are strong, not what
-  the model "understands".
-
-## Not claimed
-
-State-of-the-art accuracy; exact numerical reproduction of the paper; that residual connections
-"solve vanishing gradients"; production readiness.
+- **Single-seed depth sweep:** Eight complete models used seed 1 and a fixed split seed 42; no independent-seed uncertainty interval has yet been published. Differences of a few hundredths of a percent should not be ranked.
+- **Dataset scope:** CIFAR-10 (32×32 images), not ImageNet; results are about these particular models and settings.
+- **Schedule:** 80 epochs, with learning-rate milestones at 40 and 60, rather than the original paper's longer training run. No exact paper numerical reproduction is claimed.
+- **Implementation deviations:** Per-channel standardization and reflected-padding crop differ from the paper's preprocessing. Comparisons are valid within this implementation; direct comparison to paper percentages requires care.
+- **Device:** Single Colab Tesla T4, mixed precision in the main sweep; PyTorch 2.11.0+cu130, Python 3.13.16. Mid-run checkpoint resumption does not guarantee bitwise trajectory identity.
+- **Gradient diagnostic:** Five-epoch analysis trained fresh models and examined a fixed probe batch; it does not measure the completed 80-epoch checkpoints or prove the cause of depth degradation.
+- **Latency / memory:** Small iteration counts; hardware- and batch-sensitive numbers. Memory is an allocated-memory peak for a synthetic training step.
+- **Planned ablations:** Additional seeds, shortcut choices, BatchNorm, optimization and augmentation have configurations but not yet published measurements. Some no-BatchNorm runs change learning rate, confounding the comparison.
+- **Not claimed:** State-of-the-art accuracy, exact replication of the original paper, definitive proof of a single gradient mechanism, or production readiness.
