@@ -1,33 +1,38 @@
-# Experimental results
+# Experimental results — CIFAR-10 depth study
 
-**No completed full CIFAR-10 measurements are published in this repository yet.**
+The primary eight-model depth sweep completed 80 epochs per model, with seed 1 and a fixed 45,000/5,000 train/validation split (split seed 42). Results below are measured, not estimates. Test accuracy is calculated using the best-validation checkpoint for each run.
 
-Plots and summaries should be generated from actual run artifacts under `results/runs/`. Smoke tests and synthetic test fixtures are not evidence of model accuracy on CIFAR-10.
+| Depth | Plain final training error | ResNet final training error | Plain best validation | ResNet best validation | Plain test | ResNet test | Parameters (each) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 20 | 4.187% | 2.740% | 89.74% | 91.24% | 89.41% | 91.04% | 269,722 |
+| 32 | 5.380% | 1.556% | 89.36% | 92.32% | 88.77% | 91.73% | 464,154 |
+| 44 | 7.836% | 1.264% | 87.80% | 92.10% | 87.07% | 91.26% | 658,586 |
+| 56 | 19.518% | 1.036% | 79.38% | 92.52% | 79.43% | 91.68% | 853,018 |
 
-## Primary comparison
+Source: [measured run table](../results/tables/depth_experiment_summary.csv), exported from eight completed run histories, summaries, and held-out test evaluations. Units are percentage points for differences; the improvement at depth 56 is 12.25 points in test accuracy and 18.482 points in final training error.
 
-| Network | Depth | Train error | Validation accuracy | Held-out test accuracy | Seed |
-|---|---:|---:|---:|---:|---:|
-| Plain | 20 | pending | pending | pending | 1 |
-| ResNet | 20 | pending | pending | pending | 1 |
-| Plain | 32 | pending | pending | pending | 1 |
-| ResNet | 32 | pending | pending | pending | 1 |
-| Plain | 44 | pending | pending | pending | 1 |
-| ResNet | 44 | pending | pending | pending | 1 |
-| Plain | 56 | pending | pending | pending | 1 |
-| ResNet | 56 | pending | pending | pending | 1 |
+## Main finding
 
-The central question is whether deeper **plain** networks show higher *training error*, and whether additive shortcuts change that trend.
+The plain family's **training** error rises with depth (4.187% to 19.518%); the residual family's falls (2.740% to 1.036%). Since the paired models have identical learnable parameter counts, this is consistent with optimization-related *depth degradation* for these training configurations, not simply deeper models having too few parameters. The test-set trend supports the practical benefit of residual shortcuts here but does not independently diagnose optimization.
 
-## Additional analyses
+## Accuracy and prediction errors
 
-- Gradient norm profiles for plain-56 and ResNet-56 are generated with `scripts/analyze_gradients.py`.
-- Parameter counts, MACs, inference latency and peak memory are generated with `scripts/benchmark.py`.
-- Error statistics, a confusion matrix and an optional misclassification gallery are produced using `scripts/evaluate.py`.
-- Variance across independent training seeds must be quantified before making claims about small improvements.
+ResNet-32 attains the highest measured test accuracy in this single-seed sweep (91.73%), narrowly ahead of ResNet-56 (91.68%). Do not interpret this 0.05-point gap as a reliable ranking without repeat seeds.
 
-## Reporting rules
+For Plain-56, the lowest class recall is **cat** (61.9%); its most common confusions include dog→cat (170) and cat→dog (158). For ResNet-56, cat recall improves to 81.8%, with the same prominent confusions at lower counts: cat→dog (76), dog→cat (69). These counts come from the best-validation checkpoint and the 10,000-image test set.
 
-Use the saved configuration and environment metadata to identify each run. Report train and validation curves before drawing conclusions about optimization. Keep final test accuracy separate from model-selection metrics. Distinguish deviations from the original paper's schedule and preprocessing.
+## Gradient diagnostic
 
-No values should be entered from memory or estimated from the paper's figures.
+A separate five-epoch probe, starting new models from initialization, recorded convolution/linear layer weight-gradient L2 norms. At epoch 5, median per-layer norms were about 0.141 (Plain-56) and 0.166 (ResNet-56); the initial snapshot showed a much more extreme outlier in the plain network's first layer. The diagnostic is suggestive, **not** proof that the 80-epoch result was caused by a specific vanishing/exploding-gradient mechanism. Norms also depend on layer scale and loss dynamics.
+
+## Compute measurements
+
+On a Colab Tesla T4 GPU, measured parameter counts and per-image multiply–accumulate counts were identical for the plain and option-A residual network at each depth: 40.55M, 68.86M, 97.17M and 125.49M MACs for 20/32/44/56 layers respectively. The eight-model benchmark ran 20 timing iterations with 5 warmups, batch sizes 1 and 32. These timings are environment-dependent and should not be used as a hardware-independent speed ranking. The reported peak memory values describe the benchmark's 32-image synthetic training step, not entire original training runs.
+
+## Figures and reproducibility
+
+Original measured plots were generated and backed up to Google Drive under `resnet-research/results/figures/`; they are not embedded in this Git repository yet. They are named `depth_vs_train_error.png`, `depth_vs_val_accuracy.png`, `training_loss_curves.png`, `val_accuracy_curves.png`. Each run's full metrics, configuration, and evaluation results are held with the owner; the small summary CSV above is published for inspection.
+
+## Limitations
+
+These are eight complete **single-seed** runs with an 80-epoch schedule, not a statistical replication of the original longer CIFAR experiment. Differences in augmentation, normalization, schedules and platform matter. Additional seeds, shortcut variants and controlled ablations remain unrun or unpublished; do not present them as completed research findings. The held-out test set was used only after training for final evaluation.
