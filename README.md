@@ -4,7 +4,7 @@ This project examines a question raised by the original ResNet paper: why can ad
 
 The study implements CIFAR-sized residual networks directly in PyTorch. A plain-network switch removes the shortcut while preserving the weighted layers, making the two families comparable at the same depth. The main experiments use CIFAR-10, a fixed training/validation split, and controlled optimizer settings.
 
-**Current state:** the model code, training pipeline, evaluation tools, experiment configurations, and analysis utilities are implemented. Full training results are still pending. No accuracy figures are reported until the corresponding runs have finished and been checked.
+**Current state:** the primary eight-model CIFAR-10 depth sweep (plain and residual networks, depths 20/32/44/56) has finished 80 epochs per model and been evaluated on the held-out test set. Measured results are in [docs/results.md](docs/results.md) and [the summary CSV](results/tables/depth_experiment_summary.csv). Additional-seed replication and further ablations remain pending. At depth 56 the plain network had 19.518% final training error versus 1.036% for its parameter-matched residual counterpart; held-out test accuracy was 79.43% versus 91.68%. These are single-seed findings, not confidence intervals.
 
 ## Research question
 
