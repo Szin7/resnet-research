@@ -88,7 +88,7 @@ def load_checkpoint(
         np.random.set_state(state["numpy"])
         torch.random.set_rng_state(state["torch"].cpu())
         if state.get("cuda") is not None and torch.cuda.is_available():
-            torch.cuda.set_rng_state_all(state["cuda"])
+            torch.cuda.set_rng_state_all([s.cpu() for s in state["cuda"]])
         if data_generator is not None and state.get("data_generator") is not None:
             data_generator.set_state(state["data_generator"].cpu())
     return payload
