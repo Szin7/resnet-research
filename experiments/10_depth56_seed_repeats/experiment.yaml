@@ -1,0 +1,15 @@
+name: depth56_seed_repeats
+description: Repeat the 56-layer plain and residual models with two more training seeds.
+schedule: configs/schedules/standard.yaml
+
+runs:
+  - config: configs/models/plain_56.yaml
+    overrides: ["seed=2"]
+  - config: configs/models/resnet_56.yaml
+    overrides: ["seed=2"]
+  - config: configs/models/plain_56.yaml
+    overrides: ["seed=3"]
+  - config: configs/models/resnet_56.yaml
+    overrides: ["seed=3"]
+
+figures: []
