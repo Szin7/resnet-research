@@ -15,7 +15,7 @@ The primary experiment is finished: eight networks, each trained for 80 epochs o
 
 For the plain networks, training error increased with depth. The residual networks showed the opposite pattern. Plain-56 and ResNet-56 each have **853,018 parameters**, but their final training errors differ by **18.482 percentage points**.
 
-The depth sweep above uses seed 1. I also repeated the depth-56 pair with seed 2: Plain-56 reached 82.65% test accuracy and ResNet-56 reached 91.90%. The matched two-seed results are reported [separately](docs/depth56_seed_comparison.md); the other depths have not been repeated.
+The depth sweep above uses seed 1. I also repeated the depth-56 pair with seeds 2 and 3. Across three seeds, Plain-56 averaged **81.57%** test accuracy and ResNet-56 averaged **91.67%**. The matched three-seed results are reported [separately](docs/depth56_seed_comparison.md); the other depths have not been repeated.
 
 See the [full results](docs/results.md), [research report](docs/research_report.md), and [raw summary table](results/tables/depth_experiment_summary.csv).
 
