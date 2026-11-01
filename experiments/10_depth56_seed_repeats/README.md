@@ -1,6 +1,6 @@
 # Depth-56 seed repeats
 
-The original comparison used seed 1 at all four depths. I repeated Plain-56 and ResNet-56 with seeds 2 and 3 to check whether the training gap persisted.
+The first depth experiment used seed 1. I then trained Plain-56 and ResNet-56 again with seeds 2 and 3 to check whether the large training gap would appear again.
 
 All four additional runs are **complete (80 epochs)** and have been evaluated on the official CIFAR-10 test set.
 
@@ -13,7 +13,7 @@ Seed 3 reached **15.0200% training error / 82.62% test accuracy** for Plain-56 a
 
 The matched seed-2 accuracy difference was 9.25 percentage points in favor of the ResNet. Seed 1 showed a difference of 12.25 points. Individual results, three-seed means and caveats are in the [three-seed report](../../docs/depth56_seed_comparison.md) and [CSV](../../results/tables/depth56_seed_repeats.csv).
 
-## How the runs were completed
+## What happened during training
 
 Plain-56 seed 2 began on Colab and stopped after epoch 65 because GPU access ran out. I moved the saved checkpoint to Kaggle and finished epochs 66–80. ResNet-56 seed 2 and both seed-3 models were trained entirely on Kaggle. The complete checkpoints, logs, and evaluation outputs were backed up separately from GitHub.
 
