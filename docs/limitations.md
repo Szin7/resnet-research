@@ -1,6 +1,6 @@
 # Limitations
 
-This document distinguishes what was measured from what is planned.
+These are the limits I would keep in mind when interpreting the results. I want to keep completed work separate from experiments that are only configured.
 
 - **Seed coverage:** Eight models were trained with seed 1. The 56-layer plain/residual pair was repeated using seeds 2 and 3; the other depths were not repeated. Three seeds still provide only a limited estimate of variability. Differences of a few hundredths of a percent should not be ranked.
 - **Dataset scope:** CIFAR-10 (32×32 images), not ImageNet; results are about these particular models and settings.
