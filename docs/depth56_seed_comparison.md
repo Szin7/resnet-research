@@ -1,41 +1,55 @@
-# Depth-56 repeat: seeds 1 and 2
+# Depth-56 repeat: three training seeds
 
-After the original depth sweep, I repeated the 56-layer comparison with a second training seed. I wanted to check whether the large gap between the plain CNN and ResNet-56 appeared again when the initialization and data-order randomness changed.
+Following the original eight-model depth sweep, I repeated the 56-layer comparison with training seeds 2 and 3. I wanted to check whether the large difference between the plain CNN and the residual network would persist with different random initializations and data shuffles.
 
-Both networks have 853,018 learned parameters. They used the same CIFAR-10 45,000/5,000 train/validation split (split seed 42), standard data augmentation, SGD with momentum, and 80 epochs with learning-rate drops at epochs 40 and 60. For both seeds, the official 10,000-image test set was evaluated using the **best-validation checkpoint**.
+The plain and residual 56-layer networks each have **853,018 learnable parameters**. Each run used CIFAR-10, a fixed 45,000/5,000 train/validation split (split seed 42), the same data augmentation, SGD with momentum, and 80 epochs with learning-rate reductions after epochs 40 and 60. Checkpoints were selected on validation accuracy, and the official 10,000-image test set was evaluated with the **best-validation checkpoint**. The seed-1 results belong to the original depth sweep.
 
-## Individual results
+## Per-seed results
 
-| Network | Seed | Final train error | Best validation accuracy | Test accuracy |
+| Model | Training seed | Final training error | Best validation accuracy | Test accuracy |
 |---|---:|---:|---:|---:|
 | Plain-56 | 1 | 19.518% | 79.38% | 79.43% |
 | Plain-56 | 2 | 14.8067% | 83.34% | 82.65% |
-| ResNet-56 | 1 | 1.036% | 92.52% | 91.68% |
+| Plain-56 | 3 | 15.0200% | 82.52% | 82.62% |
+| ResNet-56 | 1 | 1.0360% | 92.52% | 91.68% |
 | ResNet-56 | 2 | 0.9378% | 92.58% | 91.90% |
+| ResNet-56 | 3 | 1.3111% | 91.92% | 91.43% |
 
-The [CSV table](../results/tables/depth56_seed_repeats.csv) contains these values. Seed-1 values are from the completed depth-sweep summary. Seed-2 values are from the final Kaggle/Colab training summaries and held-out test-evaluation output. The seed-2 full training histories and checkpoints were archived separately, rather than committed to GitHub.
+The [measurement table](../results/tables/depth56_seed_repeats.csv) records the published results. Seed-1 values are from the original depth sweep; seed-2 and seed-3 measurements come from completed Kaggle/Colab training logs, summary JSON and held-out test evaluation outputs. Full checkpoint and training archives were backed up separately; they are not stored in Git.
 
-## Comparing the two seeds
+## Summary across seeds
 
-| Measurement | Plain-56, mean (sample SD) | ResNet-56, mean (sample SD) |
+All figures below use **three independent training seeds** per architecture. The standard deviations are sample standard deviations (denominator n − 1) and describe differences between these three observed runs, not confidence intervals.
+
+| Metric | Plain-56 mean (sample SD) | ResNet-56 mean (sample SD) |
 |---|---:|---:|
-| Final training error | 17.162% (3.331 pp) | 0.987% (0.069 pp) |
-| Test accuracy | 81.04% (2.277 pp) | 91.79% (0.156 pp) |
+| Final training error | 16.448% (2.661 pp) | 1.095% (0.194 pp) |
+| Test accuracy | 81.567% (1.850 pp) | 91.670% (0.235 pp) |
 
-The test-accuracy advantage of the ResNet was **12.25 percentage points** at seed 1 and **9.25 points** at seed 2. The average matched difference was **10.75 points**.
+The residual network's matched test-accuracy advantages were **12.25, 9.25 and 8.81 percentage points** for seeds 1, 2 and 3 respectively, averaging **10.103 points**. Its lower final training error corresponded to gaps of **18.482, 13.869 and 13.709 points**, averaging **15.353 points**.
 
-The final training-error difference was **18.482 percentage points** at seed 1 and **13.8689 points** at seed 2. The same direction of the degradation result appeared in both runs.
+The most direct evidence for depth degradation is the **training error**: under the same schedule, the deep plain model fitted the training data substantially less well than the equally deep residual model in every run. The test-accuracy gap provides a useful additional result but, on its own, does not explain the optimization mechanism.
 
-Two seeds are enough to show that this was not an observation from only one initialization, but **not** enough to estimate the full variability reliably or claim statistical significance. I have kept the individual measurements visible rather than presenting the means on their own.
+## Training history and practical issues
 
-## Running the second seed
+The original depth sweep (including seed 1) ran on Colab. Plain-56 seed 2 reached epoch 65 on Colab before the GPU quota was exhausted. I transferred its full saved state—weights, optimizer, scheduler, random state and metrics—to Kaggle, changed only the dataset root in the saved configuration, and resumed training from epoch 66. The final 15 epochs were completed on Kaggle. ResNet-56 seed 2, Plain-56 seed 3 and ResNet-56 seed 3 were trained from epoch 1 to 80 on Kaggle using a Tesla T4.
 
-Plain-56 seed 2 started on Colab, but GPU quota stopped the run after epoch 65. I copied its saved model, optimizer, scheduler, RNG state, configuration and metrics into Kaggle. Once the dataset was prepared with the original split seed, I updated only the data-root path and resumed from epoch 66. Training completed at epoch 80 and I evaluated the saved checkpoints.
+The Kaggle session used PyTorch 2.11.0+cu128, while the original Colab environment used a different CUDA build. Resuming a checkpoint across environments preserves training state but does not necessarily reproduce a bit-for-bit identical uninterrupted run. The original training settings and data split were retained, and all reported results were measured after the runs completed.
 
-ResNet-56 seed 2 was trained from epoch 1 through 80 on a Kaggle Tesla T4. The recorded software environment for the Kaggle session was PyTorch 2.11.0+cu128; the original Colab environment used a different CUDA build. The change in runtime is worth noting: a resumed run on different hardware/software is not guaranteed to follow the identical floating-point trajectory it would have followed without interruption.
+## Reproduce the summary, not the training
 
-The configurations for running the seed-2 pair are in [experiments/10_depth56_seed_repeats](../experiments/10_depth56_seed_repeats/). The script [report_seed_repeats.py](../scripts/report_seed_repeats.py) can regenerate a comparison with `--seeds 1 2` when all four complete run folders are present in one `--runs-dir` directory. The published CSV contains the values from the recorded outputs; it is not a replacement for keeping the complete run folders.
+When the **six complete run directories** (two models × three seeds) are all restored under one `results/runs/` directory, the existing script can regenerate the CSV and print per-model mean/sample standard deviation:
 
-## Conclusion
+```bash
+python scripts/report_seed_repeats.py --seeds 1 2 3 --runs-dir results/runs
+```
 
-Adding residual connections still made the 56-layer network substantially easier to train under both tested seeds. The amount of improvement varied, especially for the plain model. This is a useful follow-up to the original eight-model study, not a complete multi-seed replication across all four depths.
+This only reads `summary.json`, `metrics.csv` and `test_metrics.json`. It does **not** train models. A Kaggle session containing only seeds 2 and 3 cannot regenerate the complete report until the seed-1 run folders are restored.
+
+## Interpretation and limits
+
+Residual connections were associated with much lower training error and higher test accuracy in **all three** matched 56-layer comparisons. The plain network varied more between seeds. This strengthens the original single-seed observation, but three seeds remain a small sample and are insufficient to make strong statistical-significance or generalization claims.
+
+The 20-, 32- and 44-layer models were only tested with seed 1. The training schedule and some preprocessing choices differ from the original ResNet paper. These findings are a controlled study within this implementation, not an exact numerical reproduction of the published paper or proof of one particular gradient mechanism.
+
+**Conclusion:** In this CIFAR-10 experiment, parameter-free residual shortcuts consistently made a 56-layer network easier to optimize and more accurate across three tested random seeds.
