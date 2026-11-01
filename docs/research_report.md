@@ -27,6 +27,10 @@ The 56-layer test accuracy gap is 12.25 percentage points. ResNet-32 had the hig
 
 The test confusion matrices show a related pattern. Cat recall was 61.9% for Plain-56 and 81.8% for ResNet-56. Cat/dog confusions remained common in both models, but were more frequent in Plain-56.
 
+## Follow-up with a second seed
+
+I later repeated the depth-56 models using training seed 2. The plain model finished with 14.8067% training error and 82.65% test accuracy; the residual model finished with 0.9378% training error and 91.90% test accuracy. Both results came from the best-validation checkpoint for testing. The matched test-accuracy advantage was 9.25 points, compared with 12.25 points for seed 1. The result stayed in the same direction, although two seeds are not enough for a reliable estimate of variability. Full details are in the [seed comparison](depth56_seed_comparison.md).
+
 ## What the measurements suggest
 
 The main evidence is the *training error*, not the test accuracy alone. Deeper plain networks fitted the training set less well under the same training recipe; deeper ResNets did not. This is the degradation behavior the experiment was designed to examine.
@@ -43,7 +47,7 @@ This matters for reproducibility: the checkpoint retained the optimizer, schedul
 
 ## Limits and next experiments
 
-These are single-seed results on CIFAR-10. More seeds are needed to estimate variation. The 80-epoch schedule, dataset size, mixed precision and preprocessing differences also limit direct comparison to the paper's numbers.
+The original eight-model sweep uses seed 1; the depth-56 pair has also been evaluated with seed 2. More seeds are still needed to estimate variation reliably. The 80-epoch schedule, dataset size, mixed precision and preprocessing differences also limit direct comparison to the paper's numbers.
 
 The experiment configurations include shortcut variants, BatchNorm changes, learning-rate schedules and augmentation changes. Those full comparisons still need to be run. In the no-BatchNorm setup, learning rate also changes; that experiment cannot isolate the effect of BatchNorm alone.
 
