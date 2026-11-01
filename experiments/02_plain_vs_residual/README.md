@@ -1,24 +1,14 @@
-# Experiment 2 — Plain vs Residual
+# Plain and residual networks — comparison from the depth sweep
 
-## Research question
-At matched depth and parameter count, how does adding the residual shortcut change convergence and
-final performance?
+This comparison uses the same eight finished runs as [Experiment 1](../01_depth/README.md); it does not require another training session. The only architectural difference in each matched pair is the addition of the parameter-free option-A shortcut.
 
-## Hypothesis
-**H2:** at depth ≥ 32 with identical parameter count, the residual model reaches a given training
-loss in fewer epochs and ends with higher test accuracy; at depth 20 the gap is small (< 1 point).
+| Layers | Plain test accuracy | ResNet test accuracy | Difference |
+|---:|---:|---:|---:|
+| 20 | 89.41% | 91.04% | +1.63 points |
+| 32 | 88.77% | 91.73% | +2.96 points |
+| 44 | 87.07% | 91.26% | +4.19 points |
+| 56 | 79.43% | 91.68% | +12.25 points |
 
-## Setup
-- Runs: reuse the core sweep (plain-k vs resnet-k for k in {20,32,44,56}).
-- Fixed: depth, parameter count (option A), standard schedule, seed 1.
-- Varied: additive shortcut present / absent.
-- Metrics: train and val loss curves overlaid by family, final test accuracy, epochs-to-threshold.
+The test-accuracy gap increases with depth in these runs. The training-error comparison is more important for the degradation question: at 56 layers, it was 19.518% for the plain model and 1.036% for the residual one.
 
-## Results
-_Pending._
-
-## Interpretation
-_Pending._
-
-## Limitations
-_Pending._
+The training curves and the complete table are covered in [the main results](../../docs/results.md). This is one seed, so the gap should be checked with repeat runs before treating its size as stable.
