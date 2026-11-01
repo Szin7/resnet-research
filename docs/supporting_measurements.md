@@ -25,4 +25,4 @@ The original images are in the owner's research analysis archive and Google Driv
 
 ## Follow-up research
 
-The planned second-seed experiments and shortcut/BN/optimization/augmentation ablations remain outstanding. They require additional GPU runs and validation, and should be published separately, clearly labeled with their own configurations and seeds.
+Seed 2 for Plain-56 and ResNet-56 has been completed and is documented in the [two-seed comparison](depth56_seed_comparison.md). Seed 3 and shortcut/BN/optimization/augmentation ablations remain outstanding. They require additional GPU runs and validation, and should be published separately, clearly labeled with their own configurations and seeds.
