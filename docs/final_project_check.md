@@ -22,9 +22,9 @@ python scripts/make_figures.py --experiment experiments/01_depth/experiment.yaml
 
 This reads finished run logs; it does not retrain models. Eight complete run folders (including `summary.json` and `metrics.csv`) must be present first. The small published results CSV is not a substitute for the full 80-epoch histories.
 
-## Interrupted follow-up
+## Completed three-seed follow-up
 
-The optional Plain-56 seed-2 run was interrupted at epoch 65 on Colab, then resumed at epoch 66 on Kaggle and finished all 80 epochs. ResNet-56 seed 2 was also trained and evaluated on Kaggle. Both results are in the [depth-56 two-seed comparison](depth56_seed_comparison.md). The eight-model original table still represents seed 1.
+The optional Plain-56 seed-2 run was interrupted at epoch 65 on Colab, then resumed at epoch 66 on Kaggle and finished all 80 epochs. ResNet-56 seed 2 was also trained and evaluated on Kaggle. Both seed-2 results and the completed seed-3 pair are in the [depth-56 three-seed comparison](depth56_seed_comparison.md). The eight-model original table still represents seed 1.
 
 For future reproduction, the matching seed-2 configurations are in `experiments/10_depth56_seed_repeats/seed2_only.yaml`:
 
@@ -32,8 +32,8 @@ For future reproduction, the matching seed-2 configurations are in `experiments/
 python scripts/run_experiment.py --experiment experiments/10_depth56_seed_repeats/seed2_only.yaml --device cuda --data-root /content/drive/MyDrive/resnet-research/data --runs-dir /content/drive/MyDrive/resnet-research/results/runs
 ```
 
-After both finish and are evaluated, `scripts/report_seed_repeats.py --seeds 1 2 --runs-dir <Drive-runs-directory> --output <CSV-path>` will report the observed two-seed mean and sample standard deviation. Do not interpret the incomplete seed-2 metrics as a finished experiment.
+With all six finished 56-layer runs present in one directory, `scripts/report_seed_repeats.py --seeds 1 2 3 --runs-dir <runs-directory> --output <CSV-path>` regenerates the measured three-seed summary without retraining. The seed-2 and seed-3 run checkpoints and evaluation files are backed up separately from GitHub.
 
 ## Scope
 
-This is a completed single-seed depth study and portfolio project, not a multi-seed statistical replication of the original ResNet paper. Shortcut-choice, normalization, optimizer and augmentation studies remain optional future work.
+This is a completed single-seed depth sweep with a three-seed follow-up for the 56-layer pair, not a full multi-seed statistical replication of the original ResNet paper. Shortcut-choice, normalization, optimizer and augmentation studies remain optional future work.
