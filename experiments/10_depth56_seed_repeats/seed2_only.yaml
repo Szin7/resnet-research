@@ -1,0 +1,11 @@
+name: depth56_seed2_only
+description: Optional two-run extension of the completed seed-1 study.
+schedule: configs/schedules/standard.yaml
+
+runs:
+  - config: configs/models/plain_56.yaml
+    overrides: ["seed=2"]
+  - config: configs/models/resnet_56.yaml
+    overrides: ["seed=2"]
+
+figures: []

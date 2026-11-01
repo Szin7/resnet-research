@@ -1,12 +1,10 @@
 # Mathematical Foundations
 
-The math needed to understand and defend this project. Each section states the operation, its
-gradient (since backpropagation is just the chain rule applied through these), and why it is used
-here. Notation is kept consistent throughout.
+These are the mathematical notes I used to understand the network and its training. They cover the operations, gradients, and shortcuts used in the implementation, with consistent notation.
 
 Companion docs: [paper_notes.md](paper_notes.md) (what the paper does),
 [project_specification.md](project_specification.md) (what we freeze). The gradient-flow section here
-is expanded with measurements in `gradient_analysis.md` (Phase 14).
+is supported by measured results in [gradient_analysis.md](gradient_analysis.md).
 
 ---
 

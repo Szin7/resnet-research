@@ -1,26 +1,12 @@
-# Experiment 3 — Remove the shortcut
+# Shortcut removal
 
-## Research question
-Is the additive shortcut itself the causal factor behind the residual network's behaviour, with
-everything else held identical?
+The existing Plain-56 and ResNet-56 runs already provide a direct comparison of the block with and without additive shortcuts. Both have 853,018 learnable parameters and use the same training recipe.
 
-## Hypothesis
-**H3:** removing only the additive skip from resnet-56 (yielding an architecturally identical
-plain-56) increases final training loss and decreases test accuracy. Because nothing else changes,
-this isolates the shortcut. A null result (no difference) would itself be a notable finding.
+| Model | Final training error | Test accuracy |
+|---|---:|---:|
+| Plain-56 (no shortcut) | 19.518% | 79.43% |
+| ResNet-56 (shortcut A) | 1.036% | 91.68% |
 
-## Setup
-- Runs: resnet-56 and plain-56 from the core sweep, plus one confirmation run of resnet-56 with the
-  additive term forced to zero at runtime (should match plain-56 within noise).
-- Fixed: architecture, parameter count, standard schedule, seed 1.
-- Varied: the `out = out + shortcut(x)` term only.
-- Metrics: Δ final training loss, Δ test accuracy, side-by-side loss curves.
+This shows a large difference in the completed seed-1 runs. It does not by itself prove that every optimization difference comes from one specific mechanism.
 
-## Results
-_Pending._
-
-## Interpretation
-_Pending._
-
-## Limitations
-_Pending — one depth, one seed; "identical except the add" depends on the option-A design._
+The earlier plan also included a separate confirmation run with shortcuts explicitly zeroed at runtime. **That extra confirmation was not run.** The results above reuse the already completed depth experiment.

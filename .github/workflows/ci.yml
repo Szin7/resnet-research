@@ -27,6 +27,8 @@ jobs:
       - name: Check experiment matrices
         shell: bash
         run: |
-          for spec in experiments/{01_depth,02_plain_vs_residual,03_residual_ablation,04_identity_vs_projection,06_ablation_grid,07_batchnorm,08_optimization,09_augmentation}/experiment.yaml; do
+          for spec in experiments/{01_depth,02_plain_vs_residual,03_residual_ablation,04_identity_vs_projection,06_ablation_grid,07_batchnorm,08_optimization,09_augmentation,10_depth56_seed_repeats}/experiment.yaml; do
             python scripts/run_experiment.py --experiment "$spec" --dry-run
           done
+          python scripts/run_experiment.py --experiment experiments/10_depth56_seed_repeats/seed2_only.yaml --dry-run
+          python scripts/report_seed_repeats.py --help > /dev/null
