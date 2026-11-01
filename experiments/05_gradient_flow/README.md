@@ -1,31 +1,13 @@
-# Experiment 5 — Gradient flow
+# Early gradient norms — completed diagnostic
 
-## Research question
-Do residual connections change how gradient magnitude is distributed across layers, early in
-training?
+I compared Plain-56 and ResNet-56 in a separate five-epoch run, using a fixed probe batch and recording L2 norms of convolutional and linear weight gradients. This is not a measurement taken from the saved 80-epoch models.
 
-## Hypothesis
-**H5:** the per-layer gradient-norm profile is flatter across depth for resnet-56 than for plain-56.
-**Careful caveat (docs/mathematics.md §5):** with BatchNorm, plain-56 gradients are likely *not*
-vanishing — the paper measured healthy norms in plain nets. If the profiles look similar, that
-supports the view that the degradation problem is about the optimization landscape, not gradient
-magnitude, and that is the result we report.
+| Probe | Plain-56 median norm | ResNet-56 median norm |
+|---|---:|---:|
+| Initialization | 6.711 | 0.454 |
+| Epoch 1 | 0.075 | 0.038 |
+| Epoch 5 | 0.141 | 0.166 |
 
-## Setup
-- Runs: short instrumented training of plain-56 and resnet-56 (~5 epochs, **AMP off**, fp32),
-  recording the L2 norm of every conv/linear weight gradient on a fixed probe batch at
-  initialization, epoch 1, and epoch 5.
-- Fixed: schedule, data, probe batch, seed.
-- Varied: family.
-- Metrics: per-layer gradient norm vs depth; aggregate mean / median / max across layers; evolution
-  over the three checkpoints. Supplement: residual-branch output magnitudes (paper Fig. 7 analogue).
+The plain network showed a particularly large gradient outlier at initialization. The layerwise distribution changed during training, and by epoch 5 the medians were relatively close.
 
-## Results
-_Pending._
-
-## Interpretation
-_Pending._
-
-## Limitations
-_Pending — one depth, one seed, first 5 epochs only; weight-gradient norms, not input-gradient norms
-(a second view may be added)._
+The measurements were saved to Google Drive. The published [gradient table](../../results/tables/gradient_norm_summary.csv) and [analysis notes](../../docs/gradient_analysis.md) explain their limits. Gradient size alone does not identify the cause of depth degradation.
