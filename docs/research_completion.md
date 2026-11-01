@@ -18,7 +18,7 @@ The four original training-history PNGs and full per-epoch histories are saved i
 
 An original ResNet-56 run was interrupted by a Colab GPU limit after epoch 31. The checkpoint loader initially failed to restore the saved CUDA RNG state; that issue was fixed and training resumed from epoch 32. The model completed all 80 epochs.
 
-A later optional run of Plain-56 with seed 2 reached a last logged epoch of 65 before GPU access was restricted again. A checkpoint was present in Drive, but that run did **not** finish and is not counted in the published results. ResNet-56 seed 2 has not started.
+A later Plain-56 seed-2 run stopped at epoch 65 on Colab. I transferred the checkpoint and metrics to Kaggle, resumed from epoch 66, and completed 80 epochs. I also trained ResNet-56 seed 2 for 80 epochs on Kaggle. Both were evaluated on the held-out test set. See the [two-seed comparison](depth56_seed_comparison.md).
 
 ## Quick verification
 
@@ -30,4 +30,4 @@ python scripts/run_experiment.py --experiment experiments/01_depth/experiment.ya
 
 No GPU is needed to preview the experiment matrix or run the offline tests. To reproduce the published measurements, the full 80-epoch runs and held-out evaluations must be performed using the documented setup.
 
-The additional-seed, BatchNorm, optimizer, augmentation and shortcut-variant comparisons are possible follow-ups, not part of the finished eight-model result.
+The depth-56 comparison now has two completed training seeds. Seed 3 and the additional BatchNorm, optimizer, augmentation and shortcut-variant experiments remain possible follow-ups.
