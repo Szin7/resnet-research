@@ -1,8 +1,6 @@
 # Paper Notes — Deep Residual Learning for Image Recognition
 
-Reading notes on the paper this project reproduces. The goal is to be able to explain every design
-decision and every claim. Numbers I have not yet checked against the PDF are marked **[verify]** and
-will be confirmed in Phase 3.
+Reading notes made while studying the original ResNet paper. These notes cover the paper's claims, not the measured results of this implementation. Any **[verify]** labels are retained where a quotation or number still needs checking against the original paper. For the project's results, see [results.md](results.md).
 
 **Citation.** K. He, X. Zhang, S. Ren, J. Sun. *Deep Residual Learning for Image Recognition.*
 arXiv:1512.03385, Dec 2015. Published CVPR 2016. Microsoft Research.
