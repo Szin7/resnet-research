@@ -1,6 +1,6 @@
 # Experimental results — CIFAR-10 depth study
 
-The primary eight-model depth sweep completed 80 epochs per model, with seed 1 and a fixed 45,000/5,000 train/validation split (split seed 42). Results below are measured, not estimates. Test accuracy is calculated using the best-validation checkpoint for each run.
+I first trained eight models for 80 epochs each using seed 1 and the same 45,000/5,000 train/validation split (split seed 42). The numbers below are taken from those runs. Test accuracy is calculated using the best-validation checkpoint for each run.
 
 | Depth | Plain final training error | ResNet final training error | Plain best validation | ResNet best validation | Plain test | ResNet test | Parameters (each) |
 |---:|---:|---:|---:|---:|---:|---:|---:|
@@ -11,6 +11,10 @@ The primary eight-model depth sweep completed 80 epochs per model, with seed 1 a
 
 Source: [measured run table](../results/tables/depth_experiment_summary.csv), exported from eight completed run histories, summaries, and held-out test evaluations. Units are percentage points for differences; the improvement at depth 56 is 12.25 points in test accuracy and 18.482 points in final training error.
 
+## Depth-56 follow-up
+
+Both 56-layer models were also trained and evaluated with seeds 2 and 3. Across three seeds, Plain-56 averaged **16.448% final training error** and **81.567% test accuracy**, compared with **1.095%** and **91.670%** for ResNet-56. See the [three-seed comparison](depth56_seed_comparison.md). The table above remains the original seed-1 sweep.
+
 ## Figures
 
 ![Training error by depth](../results/figures/depth_train_error.svg)
@@ -19,7 +23,7 @@ Source: [measured run table](../results/tables/depth_experiment_summary.csv), ex
 
 These summary plots were drawn from the verified depth-study CSV. They are not replacements for the four original training-history PNGs held in the research archive.
 
-## Main finding
+## What stood out
 
 The plain family's **training** error rises with depth (4.187% to 19.518%); the residual family's falls (2.740% to 1.036%). Since the paired models have identical learnable parameter counts, this is consistent with optimization-related *depth degradation* for these training configurations, not simply deeper models having too few parameters. The test-set trend supports the practical benefit of residual shortcuts here but does not independently diagnose optimization.
 
@@ -43,4 +47,4 @@ Original measured plots were generated and backed up to Google Drive under `resn
 
 ## Limitations
 
-These are eight complete **single-seed** runs with an 80-epoch schedule, not a statistical replication of the original longer CIFAR experiment. Differences in augmentation, normalization, schedules and platform matter. Additional seeds, shortcut variants and controlled ablations remain unrun or unpublished; do not present them as completed research findings. The held-out test set was used only after training for final evaluation.
+These are eight complete **single-seed** runs with an 80-epoch schedule, not a statistical replication of the original longer CIFAR experiment. Differences in augmentation, normalization, schedules and platform matter. The depth-56 pair has now been repeated with seeds 2 and 3; the other depths and additional shortcut, BatchNorm, optimization and augmentation ablations have not been repeated or completed. The held-out test set was used only after training for final evaluation.

@@ -1,0 +1,7 @@
+model,seed,final_train_error_pct,best_val_accuracy_pct,test_accuracy_pct
+plain-56,1,19.518,79.38,79.43
+plain-56,2,14.8067,83.34,82.65
+plain-56,3,15.02,82.52,82.62
+resnet-56,1,1.036,92.52,91.68
+resnet-56,2,0.9378,92.58,91.90
+resnet-56,3,1.3111,91.92,91.43

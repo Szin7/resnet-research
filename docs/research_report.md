@@ -2,7 +2,7 @@
 
 ## Question
 
-The original ResNet paper showed that adding more layers to a plain network does not always make it easier to fit the training data. The question here is whether I can observe the same behavior in a smaller CIFAR-10 experiment, and what changes when the convolutional blocks include residual shortcuts.
+I started this project because I wanted to understand the degradation problem in the original ResNet paper. If a deeper network has more layers, why can it actually fit the training data worse? I tested plain CNNs and ResNets on CIFAR-10 to see the difference myself.
 
 ## Setup
 
@@ -27,9 +27,13 @@ The 56-layer test accuracy gap is 12.25 percentage points. ResNet-32 had the hig
 
 The test confusion matrices show a related pattern. Cat recall was 61.9% for Plain-56 and 81.8% for ResNet-56. Cat/dog confusions remained common in both models, but were more frequent in Plain-56.
 
+## Follow-up with three seeds
+
+I repeated both 56-layer models using seeds 2 and 3. Across three seeds, the plain network averaged 16.448% final training error and 81.567% test accuracy, versus 1.095% and 91.670% for ResNet-56. The matched test-accuracy advantages were 12.25, 9.25 and 8.81 percentage points. All test results used the best-validation checkpoint. The difference remained in the same direction across three runs, though this is still a small sample. Full results and the interrupted-run recovery are documented in the [three-seed comparison](depth56_seed_comparison.md).
+
 ## What the measurements suggest
 
-The main evidence is the *training error*, not the test accuracy alone. Deeper plain networks fitted the training set less well under the same training recipe; deeper ResNets did not. This is the degradation behavior the experiment was designed to examine.
+I focused mainly on *training error*, not just test accuracy. Deeper plain networks fitted the training set less well under the same training recipe; deeper ResNets did not. This is the degradation behavior the experiment was designed to examine.
 
 It does not establish a single cause. A separate five-epoch gradient-norm probe showed substantially different layer-gradient scales, especially near initialization, but those models were trained separately. I cannot directly attribute the completed 80-epoch results to one gradient mechanism from that diagnostic.
 
@@ -39,16 +43,16 @@ The compute benchmark likewise measures architectural costs, not model quality. 
 
 The initial Colab session hit its GPU usage limit during ResNet-56. The run had completed 31 epochs and had saved a checkpoint to Drive. When GPU access returned, loading the saved CUDA random state failed because PyTorch required a CPU ByteTensor. I corrected the checkpoint loader, resumed at epoch 32, and finished all 80 epochs. The fix is now part of the repository.
 
-This matters for reproducibility: the checkpoint retained the optimizer, scheduler and model state, but recovering a GPU run does not guarantee bit-for-bit identical training to an uninterrupted session.
+That experience made checkpoint saving especially important to me. The model, optimizer and scheduler could be recovered, although resuming a GPU run does not guarantee exactly the same numbers as an uninterrupted session.
 
 ## Limits and next experiments
 
-These are single-seed results on CIFAR-10. More seeds are needed to estimate variation. The 80-epoch schedule, dataset size, mixed precision and preprocessing differences also limit direct comparison to the paper's numbers.
+The original eight-model sweep uses seed 1; the depth-56 pair has also been evaluated with seeds 2 and 3. More seeds are still needed to estimate variation reliably. The 80-epoch schedule, dataset size, mixed precision and preprocessing differences also limit direct comparison to the paper's numbers.
 
 The experiment configurations include shortcut variants, BatchNorm changes, learning-rate schedules and augmentation changes. Those full comparisons still need to be run. In the no-BatchNorm setup, learning rate also changes; that experiment cannot isolate the effect of BatchNorm alone.
 
 ## Conclusion
 
-In these eight CIFAR-10 runs, residual shortcuts made the deeper networks much easier to train under otherwise matched settings. The clearest result was at 56 layers, where training error dropped from 19.518% for the plain network to 1.036% for ResNet-56. That is strong evidence of depth degradation in this particular experiment, while broader claims require additional runs and controls.
+In my CIFAR-10 runs, residual shortcuts helped the deeper networks train much better under matched settings. The clearest result was at 56 layers, where training error dropped from 19.518% for the plain network to 1.036% for ResNet-56. That is strong evidence of depth degradation in this particular experiment, while broader claims require additional runs and controls.
 
 For the detailed table, see [results.md](results.md); for the full caveats, see [limitations.md](limitations.md).
