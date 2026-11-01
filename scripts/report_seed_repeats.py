@@ -62,7 +62,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--runs-dir", default="results/runs")
     parser.add_argument("--output", default="results/tables/depth56_seed_repeats.csv")
-    parser.add_argument("--seeds", type=int, nargs="+", default=list(SEEDS),\n                        help="completed seeds to include (e.g. --seeds 1 2)")\n    args = parser.parse_args()\n    if len(set(args.seeds)) != len(args.seeds) or len(args.seeds) < 2:\n        parser.error("supply at least two distinct seeds")
+    parser.add_argument("--seeds", type=int, nargs="+", default=list(SEEDS),
+                        help="completed seeds to include (e.g. --seeds 1 2)")
+    args = parser.parse_args()
+    if len(set(args.seeds)) != len(args.seeds) or len(args.seeds) < 2:
+        parser.error("supply at least two distinct seeds")
 
     rows = collect(Path(args.runs_dir), tuple(args.seeds))
     target = Path(args.output)
