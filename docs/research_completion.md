@@ -1,6 +1,6 @@
 # Project status
 
-The primary study is complete. I trained and evaluated eight CIFAR-10 networks: plain and residual versions with 20, 32, 44 and 56 weighted layers. All eight reached 80 epochs with seed 1.
+I finished the main CIFAR-10 study with eight networks: plain and residual models at 20, 32, 44 and 56 layers. All eight completed 80 epochs with seed 1.
 
 The main finding is in training error. Plain-56 finished at 19.518% while ResNet-56 finished at 1.036%, despite having the same 853,018 learned parameters. Their held-out test accuracies were 79.43% and 91.68% respectively. The [results table](../results/tables/depth_experiment_summary.csv) and [research report](research_report.md) contain the other depths.
 
