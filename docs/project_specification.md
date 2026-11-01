@@ -5,8 +5,7 @@ is recorded in the "Change log" at the bottom with a date and reason. Discussion
 in [paper_notes.md](paper_notes.md); the mathematical treatment goes in `mathematics.md` (Phase 3);
 this document is the "what", not the "why".
 
-Status: Phase 2 draft, 2026-08-31. Nothing here has been executed yet. All performance numbers in
-this document are targets or "to measure" — no measured results exist.
+This is the original planning specification from August 2026, retained as a record of how the project was scoped. Its expected values, compute estimates, and future experiment list are **historical plans**, not current results. The main eight-model run has since finished; see [measured results](results.md) and [current status](research_completion.md).
 
 ---
 
