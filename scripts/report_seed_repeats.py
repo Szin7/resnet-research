@@ -1,8 +1,8 @@
 """Summarize the finished 56-layer seed repeats without retraining anything.
 
-Expects three complete runs for each model, including test_metrics.json
+Expects completed runs for the selected seeds, including test_metrics.json
 from scripts/evaluate.py. The study uses seed 1 from the depth sweep and
-seeds 2/3 from experiments/10_depth56_seed_repeats.
+seeds 2/3 from experiments/10_depth56_seed_repeats. Pass --seeds 1 2 if stopping after seed 2.
 """
 
 from __future__ import annotations
@@ -20,10 +20,10 @@ MODELS = ("plain_56", "resnet_56")
 SEEDS = (1, 2, 3)
 
 
-def collect(runs_dir: Path) -> list[dict]:
+def collect(runs_dir: Path, seeds: tuple[int, ...] = SEEDS) -> list[dict]:
     rows = []
     for model in MODELS:
-        for seed in SEEDS:
+        for seed in seeds:
             cfg = load_config(
                 [f"configs/models/{model}.yaml", "configs/schedules/standard.yaml"],
                 overrides=[f"seed={seed}"],
@@ -62,9 +62,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--runs-dir", default="results/runs")
     parser.add_argument("--output", default="results/tables/depth56_seed_repeats.csv")
+    parser.add_argument("--seeds", type=int, nargs="+", default=list(SEEDS),
+                        help="completed seeds to include (e.g. --seeds 1 2)")
     args = parser.parse_args()
+    if len(set(args.seeds)) != len(args.seeds) or len(args.seeds) < 2:
+        parser.error("supply at least two distinct seeds")
 
-    rows = collect(Path(args.runs_dir))
+    rows = collect(Path(args.runs_dir), tuple(args.seeds))
     target = Path(args.output)
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("w", newline="") as handle:
@@ -81,7 +85,7 @@ def main() -> None:
             f"{model}: training error {statistics.mean(train):.3f}% "
             f"(sample SD {statistics.stdev(train):.3f}); "
             f"test accuracy {statistics.mean(test):.3f}% "
-            f"(sample SD {statistics.stdev(test):.3f}); n=3"
+            f"(sample SD {statistics.stdev(test):.3f}); n={len(samples)}"
         )
 
 
