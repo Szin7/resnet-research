@@ -2,7 +2,7 @@
 
 ## Question
 
-The original ResNet paper showed that adding more layers to a plain network does not always make it easier to fit the training data. The question here is whether I can observe the same behavior in a smaller CIFAR-10 experiment, and what changes when the convolutional blocks include residual shortcuts.
+I started this project because I wanted to understand the degradation problem in the original ResNet paper. If a deeper network has more layers, why can it actually fit the training data worse? I tested plain CNNs and ResNets on CIFAR-10 to see the difference myself.
 
 ## Setup
 
@@ -33,7 +33,7 @@ I repeated both 56-layer models using seeds 2 and 3. Across three seeds, the pla
 
 ## What the measurements suggest
 
-The main evidence is the *training error*, not the test accuracy alone. Deeper plain networks fitted the training set less well under the same training recipe; deeper ResNets did not. This is the degradation behavior the experiment was designed to examine.
+I focused mainly on *training error*, not just test accuracy. Deeper plain networks fitted the training set less well under the same training recipe; deeper ResNets did not. This is the degradation behavior the experiment was designed to examine.
 
 It does not establish a single cause. A separate five-epoch gradient-norm probe showed substantially different layer-gradient scales, especially near initialization, but those models were trained separately. I cannot directly attribute the completed 80-epoch results to one gradient mechanism from that diagnostic.
 
@@ -43,7 +43,7 @@ The compute benchmark likewise measures architectural costs, not model quality. 
 
 The initial Colab session hit its GPU usage limit during ResNet-56. The run had completed 31 epochs and had saved a checkpoint to Drive. When GPU access returned, loading the saved CUDA random state failed because PyTorch required a CPU ByteTensor. I corrected the checkpoint loader, resumed at epoch 32, and finished all 80 epochs. The fix is now part of the repository.
 
-This matters for reproducibility: the checkpoint retained the optimizer, scheduler and model state, but recovering a GPU run does not guarantee bit-for-bit identical training to an uninterrupted session.
+That experience made checkpoint saving especially important to me. The model, optimizer and scheduler could be recovered, although resuming a GPU run does not guarantee exactly the same numbers as an uninterrupted session.
 
 ## Limits and next experiments
 
@@ -53,6 +53,6 @@ The experiment configurations include shortcut variants, BatchNorm changes, lear
 
 ## Conclusion
 
-In these eight CIFAR-10 runs, residual shortcuts made the deeper networks much easier to train under otherwise matched settings. The clearest result was at 56 layers, where training error dropped from 19.518% for the plain network to 1.036% for ResNet-56. That is strong evidence of depth degradation in this particular experiment, while broader claims require additional runs and controls.
+In my CIFAR-10 runs, residual shortcuts helped the deeper networks train much better under matched settings. The clearest result was at 56 layers, where training error dropped from 19.518% for the plain network to 1.036% for ResNet-56. That is strong evidence of depth degradation in this particular experiment, while broader claims require additional runs and controls.
 
 For the detailed table, see [results.md](results.md); for the full caveats, see [limitations.md](limitations.md).
