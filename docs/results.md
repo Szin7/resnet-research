@@ -13,7 +13,7 @@ Source: [measured run table](../results/tables/depth_experiment_summary.csv), ex
 
 ## Depth-56 follow-up
 
-Both 56-layer models were subsequently trained and evaluated with seed 2. Plain-56 obtained 14.8067% final training error and 82.65% test accuracy, while ResNet-56 obtained 0.9378% final training error and 91.90% test accuracy. See the [two-seed comparison](depth56_seed_comparison.md). The table above remains the original seed-1 sweep.
+Both 56-layer models were also trained and evaluated with seeds 2 and 3. Across three seeds, Plain-56 averaged **16.448% final training error** and **81.567% test accuracy**, compared with **1.095%** and **91.670%** for ResNet-56. See the [three-seed comparison](depth56_seed_comparison.md). The table above remains the original seed-1 sweep.
 
 ## Figures
 
@@ -47,4 +47,4 @@ Original measured plots were generated and backed up to Google Drive under `resn
 
 ## Limitations
 
-These are eight complete **single-seed** runs with an 80-epoch schedule, not a statistical replication of the original longer CIFAR experiment. Differences in augmentation, normalization, schedules and platform matter. The depth-56 pair has now been repeated with seed 2; seeds 3 and the additional shortcut, BatchNorm, optimization and augmentation ablations have not been completed. The held-out test set was used only after training for final evaluation.
+These are eight complete **single-seed** runs with an 80-epoch schedule, not a statistical replication of the original longer CIFAR experiment. Differences in augmentation, normalization, schedules and platform matter. The depth-56 pair has now been repeated with seeds 2 and 3; the other depths and additional shortcut, BatchNorm, optimization and augmentation ablations have not been repeated or completed. The held-out test set was used only after training for final evaluation.
