@@ -11,6 +11,14 @@ The primary eight-model depth sweep completed 80 epochs per model, with seed 1 a
 
 Source: [measured run table](../results/tables/depth_experiment_summary.csv), exported from eight completed run histories, summaries, and held-out test evaluations. Units are percentage points for differences; the improvement at depth 56 is 12.25 points in test accuracy and 18.482 points in final training error.
 
+## Figures
+
+![Training error by depth](../results/figures/depth_train_error.svg)
+
+![Test accuracy by depth](../results/figures/depth_test_accuracy.svg)
+
+These summary plots were drawn from the verified depth-study CSV. They are not replacements for the four original training-history PNGs held in the research archive.
+
 ## Main finding
 
 The plain family's **training** error rises with depth (4.187% to 19.518%); the residual family's falls (2.740% to 1.036%). Since the paired models have identical learnable parameter counts, this is consistent with optimization-related *depth degradation* for these training configurations, not simply deeper models having too few parameters. The test-set trend supports the practical benefit of residual shortcuts here but does not independently diagnose optimization.
@@ -31,7 +39,7 @@ On a Colab Tesla T4 GPU, measured parameter counts and per-image multiply–accu
 
 ## Figures and reproducibility
 
-Original measured plots were generated and backed up to Google Drive under `resnet-research/results/figures/`; they are not embedded in this Git repository yet. They are named `depth_vs_train_error.png`, `depth_vs_val_accuracy.png`, `training_loss_curves.png`, `val_accuracy_curves.png`. Each run's full metrics, configuration, and evaluation results are held with the owner; the small summary CSV above is published for inspection.
+Original measured plots were generated and backed up to Google Drive under `resnet-research/results/figures/`; the four original PNGs are not embedded in this Git repository yet; the two smaller summary SVGs above are included. They are named `depth_vs_train_error.png`, `depth_vs_val_accuracy.png`, `training_loss_curves.png`, `val_accuracy_curves.png`. Each run's full metrics, configuration, and evaluation results are held with the owner; the small summary CSV above is published for inspection.
 
 ## Limitations
 
