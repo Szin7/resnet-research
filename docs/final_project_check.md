@@ -24,9 +24,9 @@ This reads finished run logs; it does not retrain models. Eight complete run fol
 
 ## Interrupted follow-up
 
-The optional Plain-56 **seed-2** experiment was interrupted after epoch **65/80** when Colab GPU access was restricted. Its `metrics.csv` and `checkpoints/final.pt` were reported present in the user's Drive. ResNet-56 seed 2 has not started. Neither model has a completed seed-2 result, and neither is included in the published accuracy table.
+The optional Plain-56 seed-2 run was interrupted at epoch 65 on Colab, then resumed at epoch 66 on Kaggle and finished all 80 epochs. ResNet-56 seed 2 was also trained and evaluated on Kaggle. Both results are in the [depth-56 two-seed comparison](depth56_seed_comparison.md). The eight-model original table still represents seed 1.
 
-If GPU time becomes available, use `experiments/10_depth56_seed_repeats/seed2_only.yaml` to finish the two runs without starting seed 3:
+For future reproduction, the matching seed-2 configurations are in `experiments/10_depth56_seed_repeats/seed2_only.yaml`:
 
 ```bash
 python scripts/run_experiment.py --experiment experiments/10_depth56_seed_repeats/seed2_only.yaml --device cuda --data-root /content/drive/MyDrive/resnet-research/data --runs-dir /content/drive/MyDrive/resnet-research/results/runs
